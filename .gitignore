@@ -141,3 +141,15 @@ tasks.txt
 # Pero permitir archivos de ejemplo pequeños
 !examples/*.csv
 !test_data/*.csv
+
+# Docs - solo trackear estructura específica
+/docs/*
+!/docs/config/
+!/docs/content/
+!/docs/main.tex
+
+# Presentation - solo trackear estructura específica
+/presentation/*
+!/presentation/config/
+!/presentation/content/
+!/presentation/main.tex

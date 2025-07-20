@@ -1,0 +1,37 @@
+\documentclass{beamer}
+
+% Importar configuración
+\input{config/packages}
+\input{config/beamer_style}
+\input{config/commands}
+
+\begin{document}
+
+% Diapositiva de título
+\begin{frame}
+    \titlepage
+\end{frame}
+
+% Tabla de contenidos
+\begin{frame}{Contenido}
+    \tableofcontents
+\end{frame}
+
+% Incluir slides del contenido
+\input{content/introduccion}
+\input{content/marco_teorico}
+\input{content/metodologia}
+\input{content/resultados}
+\input{content/conclusiones}
+
+% Slide de agradecimientos
+\begin{frame}
+    \centering
+    \Huge \textbf{¡Gracias por su atención!}
+    
+    \vspace{1em}
+    
+    \Large ¿Preguntas?
+\end{frame}
+
+\end{document}

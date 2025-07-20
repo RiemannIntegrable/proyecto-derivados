@@ -1,0 +1,72 @@
+\section{Marco Teórico}
+
+\begin{frame}{Heterocedasticidad Condicional}
+    \begin{itemize}
+        \item<1-> En series financieras: $\text{Var}(r_t | \Fcal_{t-1}) = \sigma_t^2$
+        \item<2-> La varianza condicional \emphasis{cambia en el tiempo}
+        \item<3-> Características estilizadas:
+        \begin{itemize}
+            \item Clusters de volatilidad
+            \item Colas pesadas
+            \item Asimetría en respuesta a shocks
+        \end{itemize}
+    \end{itemize}
+    
+    \vspace{1em}
+    
+    \onslide<4->{
+    \begin{alertblock}{Problema}
+        Los modelos clásicos asumen varianza constante: $\sigma^2$
+    \end{alertblock}
+    }
+\end{frame}
+
+\begin{frame}{Modelo GARCH(p,q)}
+    \begin{block}{Especificación}
+        \begin{align}
+            r_t &= \mu_t + \epsilon_t \\
+            \epsilon_t &= \sigma_t z_t, \quad z_t \sim \text{i.i.d.}(0,1) \\
+            \sigma_t^2 &= \omega + \sum_{i=1}^q \alpha_i \epsilon_{t-i}^2 + \sum_{j=1}^p \beta_j \sigma_{t-j}^2
+        \end{align}
+    \end{block}
+    
+    \vspace{0.5em}
+    
+    \begin{itemize}
+        \item<2-> $\omega > 0$, $\alpha_i \geq 0$, $\beta_j \geq 0$
+        \item<3-> Condición de estacionaridad: $\sum_{i=1}^q \alpha_i + \sum_{j=1}^p \beta_j < 1$
+        \item<4-> GARCH(1,1): $\sigma_t^2 = \omega + \alpha \epsilon_{t-1}^2 + \beta \sigma_{t-1}^2$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Extensiones del Modelo GARCH}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{block}{GJR-GARCH}
+                \begin{align}
+                    \sigma_t^2 = \omega &+ \alpha \epsilon_{t-1}^2 \\
+                    &+ \gamma \epsilon_{t-1}^2 I_{t-1} \\
+                    &+ \beta \sigma_{t-1}^2
+                \end{align}
+                donde $I_{t-1} = 1$ si $\epsilon_{t-1} < 0$
+            \end{block}
+        \end{column}
+        
+        \begin{column}{0.5\textwidth}
+            \begin{block}{EGARCH}
+                \begin{align}
+                    \ln(\sigma_t^2) = \omega &+ \alpha \left| \frac{\epsilon_{t-1}}{\sigma_{t-1}} \right| \\
+                    &+ \gamma \frac{\epsilon_{t-1}}{\sigma_{t-1}} \\
+                    &+ \beta \ln(\sigma_{t-1}^2)
+                \end{align}
+            \end{block}
+        \end{column}
+    \end{columns}
+    
+    \vspace{1em}
+    
+    \begin{itemize}
+        \item<2-> Capturan el \emphasis{efecto apalancamiento}
+        \item<3-> Shocks negativos $\rightarrow$ mayor volatilidad
+    \end{itemize}
+\end{frame}

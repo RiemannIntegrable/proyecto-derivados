@@ -1,0 +1,78 @@
+\section{Metodología}
+
+\begin{frame}{Datos y Metodología}
+    \begin{columns}
+        \begin{column}{0.6\textwidth}
+            \begin{block}{Datos}
+                \begin{itemize}
+                    \item Serie de tiempo: Índice COLCAP
+                    \item Período: 2010-2024
+                    \item Frecuencia: Diaria
+                    \item Rendimientos logarítmicos: $r_t = \ln(P_t/P_{t-1})$
+                \end{itemize}
+            \end{block}
+        \end{column}
+        
+        \begin{column}{0.4\textwidth}
+            \begin{block}{Software}
+                \begin{itemize}
+                    \item \textbf{R} 4.4.0
+                    \item Paquetes:
+                    \begin{itemize}
+                        \item \texttt{rugarch}
+                        \item \texttt{rmgarch}
+                        \item \texttt{quantmod}
+                    \end{itemize}
+                \end{itemize}
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Proceso de Modelado}
+    \begin{enumerate}
+        \item<1-> \textbf{Análisis Exploratorio}
+        \begin{itemize}
+            \item Estadísticas descriptivas
+            \item Pruebas de raíz unitaria
+            \item Análisis de autocorrelación
+        \end{itemize}
+        
+        \item<2-> \textbf{Modelado de la Media}
+        \begin{itemize}
+            \item Selección de modelo ARMA para $\mu_t$
+            \item Criterios de información (AIC, BIC)
+        \end{itemize}
+        
+        \item<3-> \textbf{Pruebas de Heterocedasticidad}
+        \begin{itemize}
+            \item Test de Engle (ARCH-LM)
+            \item Test de Ljung-Box en residuos al cuadrado
+        \end{itemize}
+        
+        \item<4-> \textbf{Estimación GARCH}
+        \begin{itemize}
+            \item Máxima verosimilitud
+            \item Comparación de especificaciones
+        \end{itemize}
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{Implementación en R}
+    \begin{lstlisting}[language=R]
+# Especificación del modelo
+spec <- ugarchspec(
+    variance.model = list(
+        model = "sGARCH",
+        garchOrder = c(1, 1)
+    ),
+    mean.model = list(
+        armaOrder = c(1, 0)
+    ),
+    distribution.model = "norm"
+)
+
+# Estimación
+fit <- ugarchfit(spec, data = returns)
+    \end{lstlisting}
+\end{frame}

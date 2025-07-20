@@ -1,0 +1,101 @@
+\section{Resultados}
+
+\begin{frame}{Estadísticas Descriptivas}
+    \begin{table}
+        \centering
+        \begin{tabular}{lc}
+            \toprule
+            \textbf{Estadística} & \textbf{COLCAP} \\
+            \midrule
+            Media & 0.0003 \\
+            Desviación Estándar & 0.0156 \\
+            Asimetría & -0.421 \\
+            Curtosis & 8.742 \\
+            Jarque-Bera & 2847.3*** \\
+            \bottomrule
+        \end{tabular}
+        \caption{Estadísticas descriptivas de rendimientos diarios}
+    \end{table}
+    
+    \vspace{0.5em}
+    
+    \begin{itemize}
+        \item<2-> \highlight{Asimetría negativa}: mayor probabilidad de rendimientos negativos extremos
+        \item<3-> \highlight{Exceso de curtosis}: colas más pesadas que la distribución normal
+        \item<4-> Rechazo de normalidad (Jarque-Bera significativo)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Pruebas de Heterocedasticidad}
+    \begin{table}
+        \centering
+        \begin{tabular}{lcc}
+            \toprule
+            \textbf{Prueba} & \textbf{Estadístico} & \textbf{p-valor} \\
+            \midrule
+            ARCH-LM (5) & 156.42 & < 0.001 \\
+            ARCH-LM (10) & 198.73 & < 0.001 \\
+            Ljung-Box $r^2$ (10) & 203.85 & < 0.001 \\
+            \bottomrule
+        \end{tabular}
+        \caption{Pruebas de heterocedasticidad en residuos}
+    \end{table}
+    
+    \vspace{1em}
+    
+    \begin{alertblock}{Conclusión}
+        \textbf{Evidencia fuerte} de heterocedasticidad condicional en los residuos
+        $\Rightarrow$ Justifica el uso de modelos GARCH
+    \end{alertblock}
+\end{frame}
+
+\begin{frame}{Comparación de Modelos GARCH}
+    \begin{table}
+        \centering
+        \footnotesize
+        \begin{tabular}{lccc}
+            \toprule
+            \textbf{Modelo} & \textbf{AIC} & \textbf{BIC} & \textbf{Log-Lik} \\
+            \midrule
+            GARCH(1,1) & -5.8421 & -5.8312 & 8547.2 \\
+            GJR-GARCH(1,1) & -5.8534 & -5.8398 & 8563.8 \\
+            EGARCH(1,1) & -5.8512 & -5.8376 & 8559.9 \\
+            GARCH(2,1) & -5.8445 & -5.8309 & 8551.1 \\
+            \bottomrule
+        \end{tabular}
+        \caption{Criterios de selección de modelos}
+    \end{table}
+    
+    \vspace{0.5em}
+    
+    \begin{itemize}
+        \item<2-> \emphasis{GJR-GARCH(1,1)} presenta el mejor ajuste
+        \item<3-> Incorpora efectos asimétricos de volatilidad
+        \item<4-> Mejora significativa sobre GARCH estándar
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Parámetros Estimados - GJR-GARCH(1,1)}
+    \begin{table}
+        \centering
+        \begin{tabular}{lccc}
+            \toprule
+            \textbf{Parámetro} & \textbf{Estimación} & \textbf{Error Est.} & \textbf{t-stat} \\
+            \midrule
+            $\omega$ & 0.0000087 & 0.0000021 & 4.14*** \\
+            $\alpha$ & 0.0234 & 0.0056 & 4.18*** \\
+            $\gamma$ & 0.0421 & 0.0089 & 4.73*** \\
+            $\beta$ & 0.9187 & 0.0098 & 93.74*** \\
+            \bottomrule
+        \end{tabular}
+        \caption{Parámetros del modelo GJR-GARCH(1,1)}
+    \end{table}
+    
+    \vspace{0.5em}
+    
+    \begin{itemize}
+        \item<2-> \highlight{Persistencia alta}: $\alpha + \beta + \gamma/2 = 0.963$
+        \item<3-> \highlight{Efecto asimétrico significativo}: $\gamma > 0$
+        \item<4-> Shocks negativos aumentan más la volatilidad
+    \end{itemize}
+\end{frame}
