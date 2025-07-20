@@ -49,7 +49,9 @@ renv/staging/
 
 # Dentro de data
 /data/*
-# Pero NO ignorar los .gitkeep
+# Pero trackear todo lo de input y mantener los .gitkeep
+!/data/input/
+!/data/input/**
 !/data/.gitkeep
 !/data/*/.gitkeep
 !/data/**/.gitkeep
@@ -59,13 +61,9 @@ renv/staging/
 /models/*.RData
 /models/*.pkl
 
-# Imágenes generadas (opcional - descomenta si no quieres versionarlas)
-/images/*.png
-/images/*.jpg
-/images/*.pdf
-/images/*.svg
-# Pero siempre mantener
-!/images/.gitkeep
+# Imágenes - solo trackear el escudo de la universidad
+/images/*
+!/images/Escudo_de_la_Universidad_Nacional_de_Colombia_(2016).png
 
 # Generados por tex
 tex/*
