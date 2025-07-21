@@ -47,13 +47,11 @@ renv/python/
 renv/sandbox/
 renv/staging/
 
-# Dentro de data
-/data/*
-# Pero trackear todo lo de input y mantener los .gitkeep
-!/data/input/
-!/data/input/**
+# Dentro de data - excluir output y processed, pero permitir input
+/data/output/*
+/data/processed/*
+# Mantener los .gitkeep
 !/data/.gitkeep
-!/data/*/.gitkeep
 !/data/**/.gitkeep
 
 # Modelos guardados (opcional - descomenta si no quieres versionarlos)
@@ -123,7 +121,7 @@ tasks.txt
 *_files/
 
 # Archivos grandes de datos comunes
-*.csv
+# *.csv  # Comentado para permitir CSV específicos en /data/input/
 *.xlsx
 *.xls
 *.sav
