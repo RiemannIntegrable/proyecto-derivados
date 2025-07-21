@@ -1,0 +1,62 @@
+\section{Marco teórico}
+
+Una serie de tiempo es una serie de ibservaciones indexadas en el tiempo. Mediante modelos de serie clásicos buscan descirbir el comportamiendo del proceso esticastico que subyace a los datos. Bajo condiciones de estacionaridad modelos como el ARMA logra campturar el comportamiento de la serie de timepo. No obstante, en muchos modelos no se puede asumir estacionaridad (como es en el caso del precio de la opciones). Asumir que el proceso estocastico subyacente implica que las propiedades dependientes de los momentos se mantienene en el tiempo; en el caso de estacionaridad debil unicamente se requiere que el valor esperado y la función de covarianza no varien con el tiempo y que exista el sgundo momento.
+\newline
+
+Si vemos el comprotamiento del S\&P500 vemos que no se cumplen condiones de estacionaridad, en particular la volatidad (la varianza) no se mantiene en el conste durante el tiempo. ¿Será posible establecer un modelo para evaluar y estimar la heterocedasticidad de la serie de timepo? Justamente esta pregunta es lo que busca responder los modelos ARCH (''autoregressive conditional heteroscedasticity'') y GARCH (''general autoregressive condicional heteroscedasticity''). 
+\newline 
+
+Sea $Z_t:= \ln\left(\frac{P_t}{P_{t-1}}\right)$ y sea $h_t= \mathbb{V}\left(Z_t|Z_s,s<t\right)$, el modelo ARCH plantea que: 
+\begin{align*}
+    Z_t = \sqrt{h_t} e_{t},
+\end{align*}
+donde $\{e_t\}$ es un proceso estocastico Normal$(0,1)$ indenticamente distribuido. En este caso $h_t$ es la volatilidad del modelo, y esta va a estar relaciona con el proceso $\{Z_t^2\}$ por medio de la relación: 
+\begin{align*}
+    h_t = \alpha_0 + \sum_{i=1}^{p} \alpha_i Z_{t-i}^2,
+\end{align*}
+donde $\alpha_0>0$ y $\alpha_j\geq 0$ para $j\in \{1,\cdots,p\}$. 
+\begin{align*}
+    Z_t^2 &= h_t e_{t}^2\\
+    &= e_t^2\left(\alpha_0 + \alpha_1 Z_{t-1}^2\right)\\
+    &= e_t^2\left(\alpha_0 +  \alpha_1\alpha_0 e^{2}_{t} e^{2}_{t-1}+ \alpha_1^2 Z_{t-2}^2e^{ 2}_te^{2}_{t-1}\right)\\
+    &= \cdots\\
+    &= e_t^2\left(\alpha_0 \sum_{j=0}^n \alpha_1^{j}e_{t-1}^2\cdots e_{t-j}^2 +  \alpha_1^{n+1}Z_{t-n-1}^2  e^{2}_{t-1}\cdots e^{2}_{t-n}\right)\\
+    &= \alpha_0 \sum_{j=0}^n \alpha_1^{j}e^{2}_t e_{t-1}^2\cdots e_{t-j}^2 +  \alpha_1^{n+1}Z_{t-n-1}^2  e^2_t e^{2}_{t-1}\cdots e^{2}_{t-n}.
+\end{align*}
+
+Por otro lado si se mira la esperanza condicional se tiene:
+\begin{align*}
+    \mathbb{E}(Z_t^2|Z_{t-1})=(\alpha_0+\alpha_1Z^{2}_{t-1} )\mathbb{E}(e^{2}_t|Z_{t-1})=\alpha_0 +\alpha_1 Z_{t-1}^2.
+\end{align*}
+
+De la misma manera, se tiene para el modelo ARCH(p) que la expresión para $Z_t^2$ es:
+
+\begin{align*}
+    Z_t^2 &= \left(\sqrt{h_t} e_t\right)^2 = h_t e_t^2\\
+    &= \left(\alpha_0 + \sum_{i=1}^{p} \alpha_i Z_{t-i}^2\right) e_t^2\\
+    &= \alpha_0 e_t^2 + \sum_{i=1}^{p} \alpha_i Z_{t-i}^2 e_t^2\\
+    &= h_{t-i} e_{t-i}^2 = \left(\alpha_0 + \sum_{j=1}^{p} \alpha_j Z_{t-i-j}^2\right) e_{t-i}^2\\
+    &= \alpha_0 e_t^2 + \sum_{i=1}^{p} \alpha_i e_t^2 e_{t-i}^2 \left(\alpha_0 + \sum_{j=1}^{p} \alpha_j Z_{t-i-j}^2\right)\\
+    &= \alpha_0 e_t^2 + \alpha_0 \sum_{i=1}^{p} \alpha_i e_t^2 e_{t-i}^2 + \sum_{i=1}^{p} \sum_{j=1}^{p} \alpha_i \alpha_j e_t^2 e_{t-i}^2 Z_{t-i-j}^2\\
+    &= \alpha_0 e_t^2 \left(1 + \sum_{k=1}^{\infty} \sum_{\mathbf{i} \in \mathcal{I}_k} \prod_{j=1}^{k} \alpha_{i_j} e_{t-s_j}^2\right) + \text{término residual},
+\end{align*}
+
+donde $\mathcal{I}_k$ denota el conjunto de secuencias de índices de longitud $k$ y $s_j$ son los tiempos correspondientes.
+\newline
+
+
+
+Para el modelo GARCH(p,q), la volatilidad condicional se extiende a:
+\begin{align*}
+    h_t = \alpha_0 + \sum_{i=1}^{p} \alpha_i Z_{t-i}^2 + \sum_{j=1}^{q} \beta_j h_{t-j}
+\end{align*}
+
+La función de verosimilitud para el modelo GARCH, dado los parámetros $\theta = (\alpha_0, \alpha_1, \ldots, \alpha_p, \beta_1, \ldots, \beta_q)$, es:
+\begin{align*}
+    L(\theta) = \prod_{t=1}^{T} \frac{1}{\sqrt{2\pi h_t}} \exp\left(-\frac{Z_t^2}{2h_t}\right)
+\end{align*}
+
+La log-verosimilitud correspondiente es:
+\begin{align*}
+    \ell(\theta) = -\frac{T}{2}\ln(2\pi) - \frac{1}{2}\sum_{t=1}^{T}\left[\ln(h_t) + \frac{Z_t^2}{h_t}\right]
+\end{align*} 
