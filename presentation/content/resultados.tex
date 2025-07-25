@@ -50,16 +50,13 @@
 \begin{frame}{Comparación Visual: GARCH vs Volatilidad Histórica}
     \begin{figure}
         \centering
-        \includegraphics[width=0.9\textwidth]{../images/volatilidad_seaborn_comparacion.png}
+        \includegraphics[width=0.7\textwidth]{../images/volatilidad_seaborn_comparacion.png}
         \caption{Volatilidad histórica vs predicción GARCH(1,1)}
     \end{figure}
-    
-    \vspace{0.3em}
-    
+        
     \begin{itemize}
         \item<2-> GARCH captura efectivamente los \emphasis{clusters de volatilidad}
         \item<3-> Correspondencia razonable durante períodos de alta volatilidad
-        \item<4-> Modelo muestra suavizamiento comparado con volatilidad histórica
     \end{itemize}
 \end{frame}
 
@@ -87,6 +84,28 @@
         \end{itemize}
         \item<3-> Log-likelihood considerablemente mayor para GARCH
     \end{itemize}
+\end{frame}
+
+\begin{frame}{Métricas de Precisión}
+    ● ● \begin{itemize}
+        \item \textbf{MAE}:
+        {\footnotesize $$MAE = \frac{1}{n}\sum_{i=1}^{n}|y_i - \hat{y}_i|$$}
+  
+        \item \textbf{RMSE}:
+        {\footnotesize $$RMSE = \sqrt{\frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}$$}
+  
+        \item \textbf{MAPE}:
+        {\footnotesize $$MAPE = \frac{100}{n}\sum_{i=1}^{n}\left|\frac{y_i -
+    \hat{y}_i}{y_i}\right|$$}
+  
+        \item \textbf{R²}:
+        {\footnotesize $$R^2 = 1 - \frac{SS_{res}}{SS_{tot}} = 1 - \frac{\sum_{i=1}^{n}(y_i
+    - \hat{y}_i)^2}{\sum_{i=1}^{n}(y_i - \bar{y})^2}$$}
+  
+        \item \textbf{Correlación}:
+        {\footnotesize $$r = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i -
+    \bar{y})}{\sqrt{\sum_{i=1}^{n}(x_i - \bar{x})^2 \sum_{i=1}^{n}(y_i - \bar{y})^2}}$$}
+  
 \end{frame}
 
 \begin{frame}{Métricas de Precisión}

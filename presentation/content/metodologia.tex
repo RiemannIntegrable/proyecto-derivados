@@ -30,19 +30,26 @@
     \end{columns}
 \end{frame}
 
-\begin{frame}{Funciones de Autocorrelación}
+\begin{frame}
     \begin{figure}
         \centering
         \includegraphics[width=0.8\textwidth]{../images/acf_y_pacf.png}
+        \caption{ACF y PACF para retornos y volatilidad histórica del S\&P 500}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Funciones de Autocorrelación}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.5\textwidth]{../images/acf_y_pacf.png}
         \caption{ACF y PACF para retornos y volatilidad histórica del S\&P 500}
     \end{figure}
     
     \vspace{0.5em}
     
     \begin{itemize}
-        \item<2-> \textbf{Retornos}: autocorrelación prácticamente nula (eficiencia de mercado)
+        \item<2-> \textbf{Retornos}: autocorrelación prácticamente nula
         \item<3-> \textbf{Volatilidad}: autocorrelación significativa y persistente
-        \item<4-> Justifica el uso de modelos GARCH
     \end{itemize}
 \end{frame}
 
