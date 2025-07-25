@@ -1,0 +1,181 @@
+\section{Resultados}
+
+\subsection{Parámetros estimados del modelo GARCH(1,1)}
+
+La estimación por máxima verosimilitud del modelo GARCH(1,1) para los retornos del S\&P 500 arrojó los siguientes resultados:
+
+\begin{table}[hbt!]
+\centering
+\caption{Estimación de parámetros del modelo GARCH(1,1)}
+\begin{tabular}{lccc}
+\hline
+\textbf{Parámetro} & \textbf{Estimación} & \textbf{Error Estándar} & \textbf{Valor-p} \\
+\hline
+$\mu$ (Media) & 0.0975 & 0.0309 & 0.0016 \\
+$\omega$ & 0.0458 & 0.0252 & 0.0691 \\
+$\alpha_1$ & 0.1076 & 0.0336 & 0.0013 \\
+$\beta_1$ & 0.8383 & 0.0468 & $< 0.001$ \\
+\hline
+\end{tabular}
+\label{tab:garch_params}
+\end{table}
+
+Los resultados muestran que:
+\begin{itemize}
+    \item La persistencia de la volatilidad ($\alpha_1 + \beta_1 = 0.9459$) es alta, indicando que los choques de volatilidad tienen efectos duraderos
+    \item Todos los parámetros son significativos al nivel del 5\% excepto $\omega$, que es marginalmente significativo (p = 0.0691)
+    \item La condición de estacionaridad se cumple ($\alpha_1 + \beta_1 < 1$)
+    \item El log-likelihood del modelo es -813.264 con 635 observaciones
+\end{itemize}
+
+\subsection{Comparación con volatilidad implícita}
+
+\begin{figure}[hbt!]
+    \centering
+    \includegraphics[scale=0.4]{../images/volatilidad_seaborn_comparacion.png}
+    \caption{Comparación entre volatilidad histórica observada y volatilidad predicha por el modelo GARCH(1,1)}
+    \label{fig:volatilidad_comparacion}   
+\end{figure}
+
+La Figura \ref{fig:volatilidad_comparacion} presenta una comparación visual entre la volatilidad histórica observada y la volatilidad predicha por el modelo GARCH(1,1). Se observa que:
+
+\begin{itemize}
+    \item El modelo GARCH captura efectivamente los clusters de volatilidad
+    \item Existe una correspondencia razonable entre ambas series, especialmente durante períodos de alta volatilidad
+    \item El modelo muestra cierto suavizamiento en comparación con la volatilidad histórica más ruidosa
+\end{itemize}
+
+\subsection{Métricas de bondad de ajuste}
+
+\subsubsection{Criterios de informaci�n}
+
+Se compararon dos enfoques para modelar la volatilidad utilizando criterios de información:
+
+\begin{table}[hbt!]
+\centering
+\caption{Comparaci�n de criterios de información}
+\begin{tabular}{lccc}
+\hline
+\textbf{Modelo} & \textbf{AIC} & \textbf{BIC} & \textbf{Log-Likelihood} \\
+\hline
+Volatilidad Implícita (VIX) & 5359.68 & 5364.12 & -2678.84 \\
+Modelo GARCH(1,1) & 941.59 & 959.38 & -466.80 \\
+\hline
+\end{tabular}
+\label{tab:criterios_info}
+\end{table}
+
+Los resultados de la Tabla \ref{tab:criterios_info} muestran que el modelo GARCH(1,1) supera significativamente a la volatilidad implícita según ambos criterios:
+\begin{itemize}
+    \item Diferencia en AIC: 4418.08 puntos a favor del GARCH
+    \item Diferencia en BIC: 4404.74 puntos a favor del GARCH
+    \item El modelo GARCH presenta un log-likelihood considerablemente mayor
+\end{itemize}
+
+\subsubsection{M�tricas de precisi�n}
+
+\begin{table}[hbt!]
+\centering
+\caption{Métricas de precisión en la predicción de volatilidad}
+\begin{tabular}{lccccc}
+\hline
+\textbf{Modelo} & \textbf{MAE} & \textbf{RMSE} & \textbf{MAPE(\%)} & \textbf{R�} & \textbf{Correlaci�n} \\
+\hline
+Volatilidad Implícita & 16.3550 & 16.8854 & 2424.08 & -922.95 & 0.6703 \\
+Modelo GARCH(1,1) & 0.3146 & 0.5070 & 49.57 & 0.1669 & 0.4580 \\
+\hline
+\end{tabular}
+\label{tab:metricas_precision}
+\end{table}
+
+Los resultados de la Tabla \ref{tab:metricas_precision} revelan:
+
+\begin{itemize}
+    \item El modelo GARCH muestra errores significativamente menores en todas las métricas de precisión
+    \item El MAPE del GARCH (49.57\%) es considerablemente menor que el de la volatilidad implícita (2424.08\%)
+    \item Aunque la correlación del GARCH es menor (0.4580 vs 0.6703), esto se debe a la diferencia en escalas de medición
+    \item El $R^2$ del GARCH (0.1669) indica un ajuste modesto pero positivo
+\end{itemize}
+
+\subsection{Pruebas de diagn�stico}
+
+\subsubsection{An�lisis de residuos}
+
+Se aplicaron tres pruebas estadísticas principales para evaluar los supuestos del modelo:
+
+\begin{table}[hbt!]
+\centering
+\caption{Pruebas estadísticas de diagnóstico}
+\begin{tabular}{lccc}
+\hline
+\textbf{Modelo} & \textbf{Shapiro-Wilk} & \textbf{Durbin-Watson} & \textbf{Breusch-Pagan} \\
+& \textbf{(normalidad)} & \textbf{(autocorrelaci�n)} & \textbf{(homocedasticidad)} \\
+\hline
+Volatilidad Implícita & $< 0.001$ & 0.0118 & $< 0.001$ \\
+Modelo GARCH(1,1) & $< 0.001$ & 0.4405 & $< 0.001$ \\
+\hline
+\end{tabular}
+\label{tab:pruebas_diagnostico}
+\end{table}
+
+Interpretación de los resultados:
+
+\begin{itemize}
+    \item \textbf{Shapiro-Wilk}: Ambos modelos rechazan la hipótesis de normalidad (p $< 0.001$), indicando colas pesadas en los residuos
+    \item \textbf{Durbin-Watson}: El modelo GARCH muestra menor evidencia de autocorrelación serial (0.4405 vs 0.0118)
+    \item \textbf{Breusch-Pagan}: Ambos modelos presentan evidencia de heterocedasticidad residual
+\end{itemize}
+
+\subsection{Interpretación económica}
+
+Los resultados obtenidos tienen importantes implicaciones económicas y financieras:
+
+\subsubsection{Persistencia de volatilidad}
+
+El coeficiente de persistencia ($\alpha_1 + \beta_1 = 0.9459$) indica que:
+\begin{itemize}
+    \item Los choques de volatilidad en el mercado de acciones tienen efectos duraderos
+    \item La vida media de un choque de volatilidad es aproximadamente $\frac{\ln(0.5)}{\ln(0.9459)} \approx 12$ períodos
+    \item Esta persistencia es consistente con el clustering de volatilidad observado en mercados financieros
+\end{itemize}
+
+\subsubsection{Componentes de la volatilidad}
+
+La descomposición de la ecuación de volatilidad revela:
+\begin{itemize}
+    \item $\omega = 0.0458$ representa el nivel base de volatilidad
+    \item $\alpha_1 = 0.1076$ captura el efecto inmediato de choques pasados (efecto ARCH)
+    \item $\beta_1 = 0.8383$ refleja la dependencia de la volatilidad pasada (efecto GARCH)
+\end{itemize}
+
+\subsubsection{Comparación con VIX}
+
+El superior desempeño del modelo GARCH frente al VIX sugiere:
+\begin{itemize}
+    \item Los modelos econométricos pueden complementar la información de mercado
+    \item El VIX refleja expectativas forward-looking, mientras que GARCH modela patrones históricos
+    \item La combinación de ambos enfoques podría mejorar la predicción de volatilidad
+\end{itemize}
+
+\subsection{Aplicaciones prácticas}
+
+Los resultados del modelo GARCH tienen múltiples aplicaciones:
+
+\begin{enumerate}
+    \item \textbf{Gestión de riesgo}: Estimación de Value-at-Risk (VaR) y Expected Shortfall
+    \item \textbf{Pricing de derivados}: Mejora en la estimación de volatilidad para modelos de Black-Scholes
+    \item \textbf{Optimización de portafolios}: Incorporación de volatilidad condicional en matrices de covarianza
+    \item \textbf{Trading algorítmico}: Señales basadas en regímenes de volatilidad
+\end{enumerate}
+
+\subsection{Limitaciones identificadas}
+
+A pesar de los buenos resultados, se identificaron las siguientes limitaciones:
+
+\begin{itemize}
+    \item Violación del supuesto de normalidad en los residuos
+    \item Presencia de heterocedasticidad residual
+    \item El modelo no captura completamente los efectos de apalancamiento (leverage effects)
+    \item Limitaciones en la predicción durante eventos extremos del mercado
+\end{itemize}
+

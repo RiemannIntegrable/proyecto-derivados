@@ -1,0 +1,115 @@
+\section{Implementación del Modelo GARCH}
+
+\subsection{Configuración del ambiente de trabajo}
+
+La implementación del modelo GARCH(1,1) se desarrolló en Python utilizando las siguientes librerías especializadas:
+
+\begin{itemize}
+    \item \textbf{arch}: Librería principal para modelos de heterocedasticidad condicional autoregresiva
+    \item \textbf{statsmodels}: Para análisis estadístico y pruebas de diagnástico
+    \item \textbf{pandas}: Manipulación y análisis de datos de series temporales
+    \item \textbf{numpy}: Operaciones matemáticas y manejo de arrays
+    \item \textbf{matplotlib/seaborn}: Visualización de datos y resultados
+    \item \textbf{yfinance}: Obtención de datos financieros en tiempo real
+\end{itemize}
+
+\subsection{Adquisición y preprocesamiento de datos}
+
+Los datos utilizados corresponden al índice S\&P 500 obtenidos mediante la API de Yahoo Finance. El preprocesamiento incluyó:
+
+\begin{enumerate}
+    \item \textbf{Cálculo de retornos logarítmicos}: 
+    \begin{align}
+        Z_t = \ln\left(\frac{P_t}{P_{t-1}}\right) \times 100
+    \end{align}
+    donde $P_t$ representa el precio de cierre en el tiempo $t$.
+    
+    \item \textbf{Volatilidad histórica}: Calculada usando una ventana móvil de 7 días:
+    \begin{align}
+        \sigma_{hist,t} = \sqrt{\frac{1}{7-1}\sum_{i=t-6}^{t}(Z_i - \bar{Z}_t)^2}
+    \end{align}
+    
+    \item \textbf{Volatilidad implícita}: Obtenida directamente del índice VIX como medida de referencia.
+\end{enumerate}
+
+\subsection{Especificación del modelo}
+
+El modelo GARCH(1,1) fue configurado con las siguientes especificaciones:
+
+\begin{verbatim}
+modelo_garch = arch_model(
+    retornos.dropna(),
+    vol='GARCH',
+    p=1,  # Orden ARCH
+    q=1,  # Orden GARCH
+    mean='Constant',
+    dist='Normal',
+    rescale=True
+)
+\end{verbatim}
+
+Esta especificación implementa:
+\begin{itemize}
+    \item Media constante: $\mu$
+    \item Volatilidad condicional GARCH(1,1): $h_t = \omega + \alpha_1 Z_{t-1}^2 + \beta_1 h_{t-1}$
+    \item Distribución normal para los residuos estandarizados
+    \item Reescalamiento automático para mejorar la convergencia numérica
+\end{itemize}
+
+\subsection{Estimación por máxima verosimilitud}
+
+El modelo fue estimado mediante el método de máxima verosimilitud, maximizando la función log-verosimilitud:
+
+\begin{align}
+    \ell(\theta) = -\frac{T}{2}\ln(2\pi) - \frac{1}{2}\sum_{t=1}^{T}\left[\ln(h_t) + \frac{Z_t^2}{h_t}\right]
+\end{align}
+
+donde $\theta = (\mu, \omega, \alpha_1, \beta_1)$ representa el vector de parámetros a estimar.
+
+La optimización se realizó utilizando algoritmos robustos implementados en la librería \texttt{arch}, con las siguientes características:
+\begin{itemize}
+    \item Estimador de covarianza robusto para los errores estándar
+    \item Condiciones de no negatividad para $\omega$, $\alpha_1$ y $\beta_1$
+    \item Condición de estacionaridad: $\alpha_1 + \beta_1 < 1$
+\end{itemize}
+
+\begin{figure}[hbt!]
+    \centering
+    \includegraphics[scale=0.4]{../images/acf_y_pacf.png}
+    \caption{Funciones de autocorrelación (ACF) y autocorrelación parcial (PACF) para los retornos y volatilidad histórica del S\&P 500}
+    \label{fig:acf_pacf}   
+\end{figure}
+
+El análisis de las funciones de autocorrelación \ref{fig:acf_pacf} revela patrones característicos que justifican el uso del modelo GARCH:
+\begin{itemize}
+    \item Los retornos muestran autocorrelación prácticamente nula, indicando eficiencia de mercado
+    \item La volatilidad histórica presenta autocorrelación significativa y persistente
+    \item Los patrones sugieren dependencia temporal en la varianza condicional
+\end{itemize}
+
+\subsection{Implementación de métricas de evaluación}
+
+Para evaluar la bondad del ajuste, se implementaron múltiples métricas:
+
+\begin{enumerate}
+    \item \textbf{Criterios de información}:
+    \begin{align}
+        AIC &= 2k - 2\ell(\hat{\theta})\\
+        BIC &= k\ln(T) - 2\ell(\hat{\theta})
+    \end{align}
+    donde $k$ es el número de parámetros y $T$ el tamaño de la muestra.
+    
+    \item \textbf{Métricas de precisión}:
+    \begin{align}
+        MAE &= \frac{1}{T}\sum_{t=1}^{T}|\sigma_{t} - \hat{\sigma}_t|\\
+        RMSE &= \sqrt{\frac{1}{T}\sum_{t=1}^{T}(\sigma_{t} - \hat{\sigma}_t)^2}\\
+        MAPE &= \frac{100}{T}\sum_{t=1}^{T}\left|\frac{\sigma_{t} - \hat{\sigma}_t}{\sigma_{t}}\right|
+    \end{align}
+    
+    \item \textbf{Pruebas de diagnóstico}:
+    \begin{itemize}
+        \item Shapiro-Wilk para normalidad de residuos estandarizados
+        \item Durbin-Watson para autocorrelación de residuos
+        \item Breusch-Pagan para homocedasticidad
+    \end{itemize}
+\end{enumerate}
