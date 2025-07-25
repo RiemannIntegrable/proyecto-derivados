@@ -1,101 +1,139 @@
 \section{Resultados}
 
-\begin{frame}{Estadísticas Descriptivas}
+\begin{frame}{Parámetros Estimados GARCH(1,1)}
     \begin{table}
         \centering
-        \begin{tabular}{lc}
+        \begin{tabular}{lccc}
             \toprule
-            \textbf{Estadística} & \textbf{COLCAP} \\
+            \textbf{Parámetro} & \textbf{Estimación} & \textbf{Error Estándar} & \textbf{Valor-p} \\
             \midrule
-            Media & 0.0003 \\
-            Desviación Estándar & 0.0156 \\
-            Asimetría & -0.421 \\
-            Curtosis & 8.742 \\
-            Jarque-Bera & 2847.3*** \\
+            $\mu$ (Media) & 0.0975 & 0.0309 & 0.0016 \\
+            $\omega$ & 0.0458 & 0.0252 & 0.0691 \\
+            $\alpha_1$ & 0.1076 & 0.0336 & 0.0013 \\
+            $\beta_1$ & 0.8383 & 0.0468 & $< 0.001$ \\
             \bottomrule
         \end{tabular}
-        \caption{Estadísticas descriptivas de rendimientos diarios}
+        \caption{Parámetros del modelo GARCH(1,1) para S\&P 500}
     \end{table}
     
     \vspace{0.5em}
     
     \begin{itemize}
-        \item<2-> \highlight{Asimetría negativa}: mayor probabilidad de rendimientos negativos extremos
-        \item<3-> \highlight{Exceso de curtosis}: colas más pesadas que la distribución normal
-        \item<4-> Rechazo de normalidad (Jarque-Bera significativo)
+        \item<2-> \highlight{Alta persistencia}: $\alpha_1 + \beta_1 = 0.9459$
+        \item<3-> Parámetros significativos al 5\% (excepto $\omega$ marginalmente)
+        \item<4-> Condición de estacionaridad se cumple
+        \item<5-> Log-likelihood: -813.264 con 635 observaciones
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Pruebas de Heterocedasticidad}
-    \begin{table}
-        \centering
-        \begin{tabular}{lcc}
-            \toprule
-            \textbf{Prueba} & \textbf{Estadístico} & \textbf{p-valor} \\
-            \midrule
-            ARCH-LM (5) & 156.42 & < 0.001 \\
-            ARCH-LM (10) & 198.73 & < 0.001 \\
-            Ljung-Box $r^2$ (10) & 203.85 & < 0.001 \\
-            \bottomrule
-        \end{tabular}
-        \caption{Pruebas de heterocedasticidad en residuos}
-    \end{table}
+\begin{frame}{Interpretación Económica}
+    \begin{block}{Persistencia de Volatilidad}
+        Coeficiente $\alpha_1 + \beta_1 = 0.9459$ indica:
+        \begin{itemize}
+            \item Choques de volatilidad tienen \emphasis{efectos duraderos}
+            \item Vida media $\approx \frac{\ln(0.5)}{\ln(0.9459)} \approx 12$ períodos
+            \item Consistente con clustering de volatilidad
+        \end{itemize}
+    \end{block}
     
-    \vspace{1em}
+    \vspace{0.5em}
     
-    \begin{alertblock}{Conclusión}
-        \textbf{Evidencia fuerte} de heterocedasticidad condicional en los residuos
-        $\Rightarrow$ Justifica el uso de modelos GARCH
-    \end{alertblock}
+    \begin{block}{Componentes de Volatilidad}
+        \begin{itemize}
+            \item<2-> $\omega = 0.0458$: nivel base de volatilidad
+            \item<3-> $\alpha_1 = 0.1076$: efecto inmediato (ARCH)
+            \item<4-> $\beta_1 = 0.8383$: dependencia del pasado (GARCH)
+        \end{itemize}
+    \end{block}
 \end{frame}
 
-\begin{frame}{Comparación de Modelos GARCH}
+\begin{frame}{Comparación Visual: GARCH vs Volatilidad Histórica}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.9\textwidth]{../images/volatilidad_seaborn_comparacion.png}
+        \caption{Volatilidad histórica vs predicción GARCH(1,1)}
+    \end{figure}
+    
+    \vspace{0.3em}
+    
+    \begin{itemize}
+        \item<2-> GARCH captura efectivamente los \emphasis{clusters de volatilidad}
+        \item<3-> Correspondencia razonable durante períodos de alta volatilidad
+        \item<4-> Modelo muestra suavizamiento comparado con volatilidad histórica
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Criterios de Información}
+    \begin{table}
+        \centering
+        \begin{tabular}{lccc}
+            \toprule
+            \textbf{Modelo} & \textbf{AIC} & \textbf{BIC} & \textbf{Log-Likelihood} \\
+            \midrule
+            Volatilidad Implícita (VIX) & 5359.68 & 5364.12 & -2678.84 \\
+            Modelo GARCH(1,1) & 941.59 & 959.38 & -466.80 \\
+            \bottomrule
+        \end{tabular}
+        \caption{Comparación de criterios de información}
+    \end{table}
+    
+    \vspace{0.5em}
+    
+    \begin{itemize}
+        \item<2-> \highlight{GARCH supera significativamente al VIX}:
+        \begin{itemize}
+            \item Diferencia AIC: 4418.08 puntos
+            \item Diferencia BIC: 4404.74 puntos
+        \end{itemize}
+        \item<3-> Log-likelihood considerablemente mayor para GARCH
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Métricas de Precisión}
     \begin{table}
         \centering
         \footnotesize
-        \begin{tabular}{lccc}
+        \begin{tabular}{lccccc}
             \toprule
-            \textbf{Modelo} & \textbf{AIC} & \textbf{BIC} & \textbf{Log-Lik} \\
+            \textbf{Modelo} & \textbf{MAE} & \textbf{RMSE} & \textbf{MAPE(\%)} & \textbf{R²} & \textbf{Correlación} \\
             \midrule
-            GARCH(1,1) & -5.8421 & -5.8312 & 8547.2 \\
-            GJR-GARCH(1,1) & -5.8534 & -5.8398 & 8563.8 \\
-            EGARCH(1,1) & -5.8512 & -5.8376 & 8559.9 \\
-            GARCH(2,1) & -5.8445 & -5.8309 & 8551.1 \\
+            Volatilidad Implícita & 16.36 & 16.89 & 2424.08 & -922.95 & 0.6703 \\
+            Modelo GARCH(1,1) & 0.31 & 0.51 & 49.57 & 0.1669 & 0.4580 \\
             \bottomrule
         \end{tabular}
-        \caption{Criterios de selección de modelos}
+        \caption{Métricas de precisión en predicción de volatilidad}
     \end{table}
     
     \vspace{0.5em}
     
     \begin{itemize}
-        \item<2-> \emphasis{GJR-GARCH(1,1)} presenta el mejor ajuste
-        \item<3-> Incorpora efectos asimétricos de volatilidad
-        \item<4-> Mejora significativa sobre GARCH estándar
+        \item<2-> GARCH muestra \highlight{errores significativamente menores}
+        \item<3-> MAPE del GARCH (49.57\%) << VIX (2424.08\%)
+        \item<4-> Aunque correlación menor, se debe a diferencias en escalas
+        \item<5-> R² del GARCH indica ajuste modesto pero positivo
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Parámetros Estimados - GJR-GARCH(1,1)}
+\begin{frame}{Pruebas de Diagnóstico}
     \begin{table}
         \centering
         \begin{tabular}{lccc}
             \toprule
-            \textbf{Parámetro} & \textbf{Estimación} & \textbf{Error Est.} & \textbf{t-stat} \\
+            \textbf{Modelo} & \textbf{Shapiro-Wilk} & \textbf{Durbin-Watson} & \textbf{Breusch-Pagan} \\
+            & \textbf{(normalidad)} & \textbf{(autocorr.)} & \textbf{(homoced.)} \\
             \midrule
-            $\omega$ & 0.0000087 & 0.0000021 & 4.14*** \\
-            $\alpha$ & 0.0234 & 0.0056 & 4.18*** \\
-            $\gamma$ & 0.0421 & 0.0089 & 4.73*** \\
-            $\beta$ & 0.9187 & 0.0098 & 93.74*** \\
+            Volatilidad Implícita & $< 0.001$ & 0.0118 & $< 0.001$ \\
+            Modelo GARCH(1,1) & $< 0.001$ & 0.4405 & $< 0.001$ \\
             \bottomrule
         \end{tabular}
-        \caption{Parámetros del modelo GJR-GARCH(1,1)}
+        \caption{Pruebas estadísticas de diagnóstico}
     \end{table}
     
     \vspace{0.5em}
     
     \begin{itemize}
-        \item<2-> \highlight{Persistencia alta}: $\alpha + \beta + \gamma/2 = 0.963$
-        \item<3-> \highlight{Efecto asimétrico significativo}: $\gamma > 0$
-        \item<4-> Shocks negativos aumentan más la volatilidad
+        \item<2-> \textbf{Normalidad}: Ambos modelos rechazan (colas pesadas)
+        \item<3-> \textbf{Autocorrelación}: GARCH muestra menor evidencia (0.4405 vs 0.0118)
+        \item<4-> \textbf{Homocedasticidad}: Ambos presentan heterocedasticidad residual
     \end{itemize}
 \end{frame}

@@ -1,14 +1,14 @@
-\section{Metodología}
+\section{Implementación}
 
-\begin{frame}{Datos y Metodología}
+\begin{frame}{Configuración del Ambiente}
     \begin{columns}
         \begin{column}{0.6\textwidth}
             \begin{block}{Datos}
                 \begin{itemize}
-                    \item Serie de tiempo: Índice COLCAP
-                    \item Período: 2010-2024
-                    \item Frecuencia: Diaria
-                    \item Rendimientos logarítmicos: $r_t = \ln(P_t/P_{t-1})$
+                    \item \textbf{Serie}: S\&P 500 (Yahoo Finance)
+                    \item \textbf{VIX}: Volatilidad implícita
+                    \item \textbf{Retornos}: $Z_t = \ln\left(\frac{P_t}{P_{t-1}}\right) \times 100$
+                    \item \textbf{Volatilidad histórica}: ventana móvil 7 días
                 \end{itemize}
             \end{block}
         \end{column}
@@ -16,12 +16,13 @@
         \begin{column}{0.4\textwidth}
             \begin{block}{Software}
                 \begin{itemize}
-                    \item \textbf{R} 4.4.0
-                    \item Paquetes:
+                    \item \textbf{Python}
+                    \item Librerías:
                     \begin{itemize}
-                        \item \texttt{rugarch}
-                        \item \texttt{rmgarch}
-                        \item \texttt{quantmod}
+                        \item \texttt{arch}
+                        \item \texttt{statsmodels}
+                        \item \texttt{yfinance}
+                        \item \texttt{pandas}
                     \end{itemize}
                 \end{itemize}
             \end{block}
@@ -29,50 +30,82 @@
     \end{columns}
 \end{frame}
 
-\begin{frame}{Proceso de Modelado}
-    \begin{enumerate}
-        \item<1-> \textbf{Análisis Exploratorio}
-        \begin{itemize}
-            \item Estadísticas descriptivas
-            \item Pruebas de raíz unitaria
-            \item Análisis de autocorrelación
-        \end{itemize}
-        
-        \item<2-> \textbf{Modelado de la Media}
-        \begin{itemize}
-            \item Selección de modelo ARMA para $\mu_t$
-            \item Criterios de información (AIC, BIC)
-        \end{itemize}
-        
-        \item<3-> \textbf{Pruebas de Heterocedasticidad}
-        \begin{itemize}
-            \item Test de Engle (ARCH-LM)
-            \item Test de Ljung-Box en residuos al cuadrado
-        \end{itemize}
-        
-        \item<4-> \textbf{Estimación GARCH}
-        \begin{itemize}
-            \item Máxima verosimilitud
-            \item Comparación de especificaciones
-        \end{itemize}
-    \end{enumerate}
+\begin{frame}{Funciones de Autocorrelación}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.8\textwidth]{../images/acf_y_pacf.png}
+        \caption{ACF y PACF para retornos y volatilidad histórica del S\&P 500}
+    \end{figure}
+    
+    \vspace{0.5em}
+    
+    \begin{itemize}
+        \item<2-> \textbf{Retornos}: autocorrelación prácticamente nula (eficiencia de mercado)
+        \item<3-> \textbf{Volatilidad}: autocorrelación significativa y persistente
+        \item<4-> Justifica el uso de modelos GARCH
+    \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Implementación en R}
-    \begin{lstlisting}[language=R]
-# Especificación del modelo
-spec <- ugarchspec(
-    variance.model = list(
-        model = "sGARCH",
-        garchOrder = c(1, 1)
-    ),
-    mean.model = list(
-        armaOrder = c(1, 0)
-    ),
-    distribution.model = "norm"
+\begin{frame}[fragile]{Especificación del Modelo}
+    \begin{block}{Código Python}
+        \begin{verbatim}
+modelo_garch = arch_model(
+    retornos.dropna(),
+    vol='GARCH',
+    p=1,  # Orden ARCH
+    q=1,  # Orden GARCH
+    mean='Constant',
+    dist='Normal',
+    rescale=True
 )
+        \end{verbatim}
+    \end{block}
+    
+    \vspace{0.5em}
+    
+    \begin{itemize}
+        \item<2-> \textbf{Media constante}: $\mu$
+        \item<3-> \textbf{Volatilidad GARCH(1,1)}: $h_t = \omega + \alpha_1 Z_{t-1}^2 + \beta_1 h_{t-1}$
+        \item<4-> \textbf{Distribución normal} para residuos estandarizados
+    \end{itemize}
+\end{frame}
 
-# Estimación
-fit <- ugarchfit(spec, data = returns)
-    \end{lstlisting}
+\begin{frame}{Estimación por Máxima Verosimilitud}
+    \begin{block}{Función Log-Verosimilitud}
+        \begin{align}
+            \ell(\theta) = -\frac{T}{2}\ln(2\pi) - \frac{1}{2}\sum_{t=1}^{T}\left[\ln(h_t) + \frac{Z_t^2}{h_t}\right]
+        \end{align}
+        donde $\theta = (\mu, \omega, \alpha_1, \beta_1)$
+    \end{block}
+    
+    \vspace{0.5em}
+    
+    \begin{itemize}
+        \item<2-> \textbf{Optimización}: algoritmos robustos
+        \item<3-> \textbf{Restricciones}: $\omega, \alpha_1, \beta_1 \geq 0$
+        \item<4-> \textbf{Estacionaridad}: $\alpha_1 + \beta_1 < 1$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Métricas de Evaluación}
+    \begin{enumerate}
+        \item<1-> \textbf{Criterios de Información}
+        \begin{align}
+            AIC &= 2k - 2\ell(\hat{\theta})\\
+            BIC &= k\ln(T) - 2\ell(\hat{\theta})
+        \end{align}
+        
+        \item<2-> \textbf{Métricas de Precisión}
+        \begin{align}
+            MAE &= \frac{1}{T}\sum_{t=1}^{T}|\sigma_{t} - \hat{\sigma}_t|\\
+            RMSE &= \sqrt{\frac{1}{T}\sum_{t=1}^{T}(\sigma_{t} - \hat{\sigma}_t)^2}
+        \end{align}
+        
+        \item<3-> \textbf{Pruebas de Diagnóstico}
+        \begin{itemize}
+            \item Shapiro-Wilk (normalidad)
+            \item Durbin-Watson (autocorrelación)
+            \item Breusch-Pagan (homocedasticidad)
+        \end{itemize}
+    \end{enumerate}
 \end{frame}
