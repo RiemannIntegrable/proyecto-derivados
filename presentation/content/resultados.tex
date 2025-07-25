@@ -86,8 +86,8 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Métricas de Precisión}
-    ● ● \begin{itemize}
+\begin{frame}{Fórmulas de Evaluación}
+    \begin{itemize}
         \item \textbf{MAE}:
         {\footnotesize $$MAE = \frac{1}{n}\sum_{i=1}^{n}|y_i - \hat{y}_i|$$}
   
@@ -95,17 +95,14 @@
         {\footnotesize $$RMSE = \sqrt{\frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}$$}
   
         \item \textbf{MAPE}:
-        {\footnotesize $$MAPE = \frac{100}{n}\sum_{i=1}^{n}\left|\frac{y_i -
-    \hat{y}_i}{y_i}\right|$$}
+        {\footnotesize $$MAPE = \frac{100}{n}\sum_{i=1}^{n}\left|\frac{y_i - \hat{y}_i}{y_i}\right|$$}
   
         \item \textbf{R²}:
-        {\footnotesize $$R^2 = 1 - \frac{SS_{res}}{SS_{tot}} = 1 - \frac{\sum_{i=1}^{n}(y_i
-    - \hat{y}_i)^2}{\sum_{i=1}^{n}(y_i - \bar{y})^2}$$}
+        {\footnotesize $$R^2 = 1 - \frac{SS_{res}}{SS_{tot}} = 1 - \frac{\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}{\sum_{i=1}^{n}(y_i - \bar{y})^2}$$}
   
         \item \textbf{Correlación}:
-        {\footnotesize $$r = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i -
-    \bar{y})}{\sqrt{\sum_{i=1}^{n}(x_i - \bar{x})^2 \sum_{i=1}^{n}(y_i - \bar{y})^2}}$$}
-  
+        {\footnotesize $$r = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum_{i=1}^{n}(x_i - \bar{x})^2 \sum_{i=1}^{n}(y_i - \bar{y})^2}}$$}
+    \end{itemize}
 \end{frame}
 
 \begin{frame}{Métricas de Precisión}
