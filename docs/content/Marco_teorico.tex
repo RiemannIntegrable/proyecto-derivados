@@ -12,13 +12,13 @@ Una serie de tiempo es una serie de observaciones indexadas en el tiempo. Median
 \end{figure}
 
 Si vemos el comportamiento del S\&P500 \ref{fig:series_temporales} vemos que no se cumplen condiciones de estacionaridad, en particular la volatilidad (la varianza) no se mantiene constante en el tiempo. ¿Será posible establecer un modelo para evaluar y estimar la heterocedasticidad de la serie de tiempo? Justamente esta pregunta es lo que buscan responder los modelos ARCH (''autoregressive conditional heteroscedasticity'') y GARCH (''general autoregressive conditional heteroscedasticity''). 
-\newline 
+\newpage
 \subsection{Modelo ARCH}
 Sea $Z_t:= \ln\left(\frac{P_t}{P_{t-1}}\right)$ y sea $h_t= \mathbb{V}\left(Z_t|Z_s,s<t\right)$, el modelo ARCH plantea que: 
 \begin{align*}
     Z_t = \sqrt{h_t} e_{t},
 \end{align*}
-donde $\{e_t\}$ es un proceso estocástico Normal$(0,1)$ independiente e idénticamente distribuido. En este caso $h_t$ es la volatilidad del modelo, y esta va a estar relacionada con el proceso $\{Z_t^2\}$ por medio de la relación: 
+donde $\{e_t\}$ es un proceso estocástico Normal$(0,1)$ independiente e idénticamente distribuido. En este caso, $P_t$, es el retorno en el día $t$ y $h_t$ es la volatilidad del modelo, esta va a estar relacionada con el proceso $\{Z_t^2\}$ por medio de la relación: 
 \begin{align*}
     h_t = \alpha_0 + \sum_{i=1}^{p} \alpha_i Z_{t-i}^2,
 \end{align*}
@@ -65,7 +65,7 @@ Para el modelo ARCH(p) se tiene una solución similar a la del modelo ARCH(1). S
     &= \alpha_0 e_t^2 \left(1 + \sum_{k=1}^{\infty} \sum_{\mathbf{i} \in \mathcal{I}_k} \prod_{j=1}^{k} \alpha_{i_j} e_{t-s_j}^2\right) + \text{término residual},
 \end{align*}
 
-donde $\mathcal{I}_k$ denota el conjunto de secuencias de índices de longitud $k$ y $s_j$ son los tiempos correspondientes, el término residual es el término que se va a 0 cuando $n$ tiende a infinito. Mediante estos resultados se tiene que la solución para el modelo ARCH(p) cuando $\sum_{1}^p\alpha_j<1 $ y $\alpha_j\geq 0 $ para todo $j\in \{1,\cdots,p\}$ es: 
+donde $\mathcal{I}_k$ denota el conjunto de secuencias de índices de longitud $k$ para $s_j$ tiempos correspondientes, y el término residual es el término que tiende a 0 cuando $n$ tiende a infinito. Mediante estos resultados se tiene que la solución para el modelo ARCH(p) cuando $\sum_{1}^p\alpha_j<1 $ y $\alpha_j\geq 0 $ para todo $j\in \{1,\cdots,p\}$ es: 
 \begin{align*}
     Z_t^2= e^{t}Z_t=e^t\sqrt{\left(1 + \sum_{k=1}^{\infty} \sum_{\mathbf{i} \in \mathcal{I}_k} \prod_{j=1}^{k} \alpha_{i_j} e_{t-s_j}^2\right)}.
 \end{align*}
@@ -105,14 +105,14 @@ donde $\Theta$ es el espacio paramétrico que incluye las restricciones de no ne
 
 \subsubsection{Solución analítica del modelo GARCH(1,1)}
 
-Para el caso específico del modelo GARCH(1,1), la ecuación de volatilidad se simplifica a:
+El modelo GARCH(1,1) constituye la especificación más parsimoniosa y ampliamente utilizada en la literatura financiera para el modelado de volatilidad condicional. La ecuación de volatilidad se define como:
 \begin{align}
     h_t = \omega + \alpha Z_{t-1}^2 + \beta h_{t-1}
 \end{align}
 
-donde $\omega = \alpha_0$, $\alpha = \alpha_1$ y $\beta = \beta_1$ para simplificar la notación.
+donde $\omega = \alpha_0$, $\alpha = \alpha_1$ y $\beta = \beta_1$ representan los parámetros del término constante, del efecto ARCH y del efecto GARCH, respectivamente. La condición de estacionaridad requiere que $\alpha + \beta < 1$.
 
-Sustituyendo recursivamente hacia atrás y asumiendo que $\alpha + \beta < 1$:
+La sustitución recursiva hacia atrás permite derivar la representación de memoria infinita. Expandiendo la ecuación recursivamente:
 \begin{align}
     h_t &= \omega + \alpha Z_{t-1}^2 + \beta h_{t-1}\\
     &= \omega + \alpha Z_{t-1}^2 + \beta(\omega + \alpha Z_{t-2}^2 + \beta h_{t-2})\\
@@ -120,87 +120,56 @@ Sustituyendo recursivamente hacia atrás y asumiendo que $\alpha + \beta < 1$:
     &= \omega \sum_{j=0}^{n-1} \beta^j + \alpha \sum_{j=0}^{n-1} \beta^j Z_{t-1-j}^2 + \beta^n h_{t-n}
 \end{align}
 
-Tomando el límite cuando $n \to \infty$ y usando la condición de estacionaridad:
+Bajo la condición de estacionaridad y tomando el límite cuando $n \to \infty$, el término residual $\beta^n h_{t-n} \to 0$, obteniéndose:
 \begin{align}
     h_t = \frac{\omega}{1-\beta} + \alpha \sum_{j=0}^{\infty} \beta^j Z_{t-1-j}^2
 \end{align}
 
-Esta expresión muestra que la volatilidad condicional es una media ponderada exponencialmente decreciente de todos los choques pasados, más una constante. La velocidad de decaimiento está determinada por $\beta$.
+Esta expresión revela la naturaleza de la volatilidad condicional como una media ponderada exponencialmente decreciente de todos los choques pasados al cuadrado, donde el parámetro $\beta$ determina la velocidad de decaimiento. La constante $\frac{\omega}{1-\beta}$ representa el nivel base de volatilidad incondicional.
 
-La varianza incondicional estacionaria se obtiene tomando esperanza:
+La varianza incondicional estacionaria se deriva aplicando el operador esperanza matemática, considerando que en el estado estacionario $\mathbb{E}[Z_t^2] = \sigma^2$ y $\mathbb{E}[h_t] = \sigma^2$:
 \begin{align}
-    \mathbb{E}[h_t] = \sigma^2 = \frac{\omega}{1 - \alpha - \beta}
+    \sigma^2 = \frac{\omega}{1 - \alpha - \beta}
 \end{align}
 
-donde se ha usado el hecho de que $\mathbb{E}[Z_t^2] = \sigma^2$ en el estado estacionario.
+Esta relación fundamental conecta los parámetros del modelo con la volatilidad incondicional de largo plazo.
+\newline
 
-\subsubsection{Propiedades del modelo GARCH(1,1)}
+El modelo GARCH(1,1) presenta características teóricas distintivas que lo hacen particularmente atractivo para aplicaciones financieras. La persistencia de volatilidad, medida por $\alpha + \beta$, captura la tendencia de los choques de volatilidad a tener efectos prolongados. Valores cercanos a la unidad indican alta persistencia, consistente con la evidencia empírica en mercados financieros donde los efectos de choques pueden persistir durante semanas o meses.
+\newline
 
-El modelo GARCH(1,1) presenta las siguientes propiedades teóricas relevantes:
+El fenómeno de clustering de volatilidad emerge naturalmente del modelo, donde períodos de alta volatilidad tienden a ser seguidos por períodos de alta volatilidad, y viceversa. Esta característica replica el comportamiento estilizado observado en series financieras, donde la volatilidad se agrupa temporalmente.
 
-\begin{enumerate}
-    \item \textbf{Persistencia de volatilidad}: El parámetro $\alpha + \beta$ mide la persistencia. Valores cercanos a 1 indican alta persistencia, donde los choques de volatilidad tienen efectos duraderos.
-    
-    \item \textbf{Clustering de volatilidad}: El modelo captura la tendencia de períodos de alta volatilidad seguidos de alta volatilidad, y períodos de baja volatilidad seguidos de baja volatilidad.
-    
-    \item \textbf{Colas pesadas}: Aunque los residuos estandarizados $\varepsilon_t = Z_t/\sqrt{h_t}$ son normales, la distribución incondicional de $Z_t$ presenta colas más pesadas que la normal.
-    
-    \item \textbf{Vida media de choques}: La vida media de un choque de volatilidad está dada por $\frac{\ln(0.5)}{\ln(\alpha + \beta)}$, que representa el tiempo necesario para que el efecto se reduzca a la mitad.
-\end{enumerate}
+La vida media de un choque de volatilidad se calcula como $\frac{\ln(0.5)}{\ln(\alpha + \beta)}$, proporcionando una medida intuitiva del tiempo necesario para que el impacto de un choque se reduzca a la mitad. Esta métrica es particularmente relevante para la gestión de riesgo y la toma de decisiones de inversión.
 
 \subsection{Volatilidad implícita y el índice VIX}
 
-La volatilidad implícita representa la expectativa del mercado sobre la volatilidad futura de un activo subyacente, derivada de los precios de las opciones. A diferencia de la volatilidad histórica, que se basa en movimientos pasados de precios, la volatilidad implícita es una medida prospectiva que incorpora las expectativas de los participantes del mercado.
+La volatilidad implícita constituye una medida prospectiva de la incertidumbre del mercado, derivada de los precios de opciones mediante la inversión del modelo de Black-Scholes. A diferencia de la volatilidad histórica, que se basa en observaciones pasadas, la volatilidad implícita incorpora las expectativas colectivas de los participantes del mercado sobre la volatilidad futura del activo subyacente.
 
 \subsubsection{Fundamentos teóricos del VIX}
 
-El VIX (Volatility Index) es un índice que mide la volatilidad implícita esperada del mercado de acciones estadounidense, calculado a partir de los precios de opciones sobre el S\&P 500. Fue desarrollado por el Chicago Board Options Exchange (CBOE) y se ha convertido en el "barómetro del miedo" del mercado.
+El VIX (Volatility Index), desarrollado por el Chicago Board Options Exchange (CBOE), representa el estándar de facto para medir la volatilidad implícita del mercado estadounidense. Su construcción se basa en una cartera sintética de opciones sobre el S\&P 500, proporcionando una medida model-free de la volatilidad esperada a 30 días.
 
-La metodología del VIX se basa en la fórmula:
+La metodología del VIX emplea la fórmula de replicación de varianza desarrollada por Demeterfi et al. (1999), que aproxima la varianza futura mediante una integral de precios de opciones:
 \begin{align}
     VIX = 100 \times \sqrt{\frac{2}{T} \sum_i \frac{\Delta K_i}{K_i^2} e^{rT} Q(K_i) - \frac{1}{T}\left[\frac{F}{K_0} - 1\right]^2}
 \end{align}
 
-donde:
-\begin{itemize}
-    \item $T$ es el tiempo hasta la expiración
-    \item $F$ es el precio forward del S\&P 500
-    \item $K_i$ son los strikes de las opciones
-    \item $\Delta K_i$ es el intervalo entre strikes
-    \item $r$ es la tasa libre de riesgo
-    \item $Q(K_i)$ es el precio promedio bid-ask de la opción con strike $K_i$
-    \item $K_0$ es el strike más cercano al precio forward $F$
-\end{itemize}
-
-\subsubsection{Interpretación económica del VIX}
-
-El VIX representa la volatilidad anualizada esperada del S\&P 500 en los próximos 30 días, expresada en términos porcentuales. Sus características principales son:
-
-\begin{enumerate}
-    \item \textbf{Medida de aversión al riesgo}: Valores altos del VIX indican mayor incertidumbre y aversión al riesgo en el mercado.
-    
-    \item \textbf{Correlación negativa con el mercado}: Típicamente, el VIX presenta correlación negativa con los retornos del S\&P 500, incrementándose durante caídas del mercado.
-    
-    \item \textbf{Mean reversion}: El VIX tiende a revertir hacia su media histórica de largo plazo, aproximadamente 20\%.
-    
-    \item \textbf{Asimetría temporal}: El VIX puede incrementarse rápidamente durante crisis pero tiende a declinar más lentamente durante recuperaciones.
-\end{enumerate}
+En esta formulación, $T$ representa el tiempo hasta la expiración, $F$ el precio forward del S\&P 500, $K_i$ los strikes de las opciones, $\Delta K_i$ los intervalos entre strikes, $r$ la tasa libre de riesgo, $Q(K_i)$ el precio promedio bid-ask de cada opción, y $K_0$ el strike más cercano al precio forward.
 
 \subsubsection{Comparación teórica: volatilidad histórica vs implícita}
 
-La relación entre volatilidad histórica y volatilidad implícita ha sido objeto de extensa investigación en finanzas. Las principales diferencias conceptuales son:
+En mercados eficientes, la volatilidad implícita debería constituir un predictor superior de la volatilidad futura realizada, dado que incorpora toda la información disponible al momento de la valoración. No obstante, la evidencia empírica documenta sistemáticamente la existencia de un "sesgo de volatilidad" , donde la volatilidad implícita excede consistentemente a la volatilidad realizada ex-post.
+\newline
 
-\begin{itemize}
-    \item \textbf{Orientación temporal}: La volatilidad histórica es backward-looking, mientras que la implícita es forward-looking.
-    
-    \item \textbf{Incorporación de información}: La volatilidad implícita incorpora expectativas sobre eventos futuros, primas de riesgo, y la demanda/oferta de opciones.
-    
-    \item \textbf{Eficiencia informativa}: En mercados eficientes, la volatilidad implícita debería ser un mejor predictor de la volatilidad futura realizada.
-    
-    \item \textbf{Sesgo de volatilidad}: La volatilidad implícita frecuentemente excede a la volatilidad realizada ex-post, fenómeno conocido como "volatility risk premium".
-\end{itemize}
+Este fenómeno sugiere que los inversionistas están dispuestos a pagar una prima por protección contra riesgo de volatilidad, reflejando aversión al riesgo y preferencias por seguros contra movimientos adversos del mercado. La magnitud y persistencia de esta prima de riesgo de volatilidad constituye un área activa de investigación en finanzas cuantitativas.
 
 \subsection{Análisis empírico de volatilidad}
 
-La Figura \ref{fig:series_temporales} ilustra el comportamiento de la volatilidad en el S\&P 500, mostrando tanto la volatilidad histórica como la volatilidad implícita (VIX). Se observa claramente la presencia de clusters de volatilidad y períodos de alta heterocedasticidad, justificando el uso de modelos ARCH/GARCH para capturar estos patrones.
+La evidencia empírica revela claramente la presencia de clusters de volatilidad, donde períodos de alta volatilidad se agrupan temporalmente, seguidos por períodos de relativa calma. Este patrón, inicialmente documentado por Mandelbrot (1963) y posteriormente formalizado por Engle (1982), constituye una de las principales motivaciones para el desarrollo de modelos ARCH/GARCH.
+\newline
+
+La heterocedasticidad condicional observada en los datos financieros refleja la naturaleza no constante de la varianza condicional a lo largo del tiempo. Esta característica contrasta fundamentalmente con los supuestos de homocedasticidad de los modelos clásicos de series temporales, justificando la necesidad de especificaciones más sofisticadas para capturar adecuadamente la dinámica de volatilidad.
+
+Los modelos GARCH proporcionan un marco teórico robusto para modelar estos patrones, permitiendo que la volatilidad condicional evolucione dinámicamente en respuesta a nueva información. La capacidad de estos modelos para capturar tanto la persistencia como el clustering de volatilidad los convierte en herramientas fundamentales para aplicaciones en gestión de riesgo, pricing de derivados, y optimización de portafolios.
 

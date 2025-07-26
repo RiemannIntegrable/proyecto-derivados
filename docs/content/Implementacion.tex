@@ -2,35 +2,22 @@
 
 \subsection{Configuración del ambiente de trabajo}
 
-La implementación del modelo GARCH(1,1) se desarrolló en Python utilizando las siguientes librerías especializadas:
-
-\begin{itemize}
-    \item \textbf{arch}: Librería principal para modelos de heterocedasticidad condicional autoregresiva
-    \item \textbf{statsmodels}: Para análisis estadístico y pruebas de diagnástico
-    \item \textbf{pandas}: Manipulación y análisis de datos de series temporales
-    \item \textbf{numpy}: Operaciones matemáticas y manejo de arrays
-    \item \textbf{matplotlib/seaborn}: Visualización de datos y resultados
-    \item \textbf{yfinance}: Obtención de datos financieros en tiempo real
-\end{itemize}
+La implementación del modelo GARCH(1,1) se desarrolló en Python utilizando un ecosistema robusto de librerías especializadas en finanzas cuantitativas. La librería \textbf{arch} constituye la herramienta principal para la estimación de modelos de heterocedasticidad condicional autoregresiva, proporcionando implementaciones optimizadas de algoritmos de máxima verosimilitud. El análisis estadístico y las pruebas de diagnóstico se realizaron mediante \textbf{statsmodels}, que ofrece una amplia gama de pruebas econométricas estándar. La manipulación de series temporales financieras se gestionó a través de \textbf{pandas}, mientras que las operaciones matemáticas vectorizadas se ejecutaron con \textbf{numpy}. La visualización de resultados se implementó utilizando \textbf{matplotlib} y \textbf{seaborn} para generar gráficos de calidad publicable, y la adquisición de datos se realizó mediante \textbf{yfinance} para acceder a información financiera en tiempo real.
 
 \subsection{Adquisición y preprocesamiento de datos}
 
-Los datos utilizados corresponden al índice S\&P 500 obtenidos mediante la API de Yahoo Finance. El preprocesamiento incluyó:
+Los datos utilizados corresponden al índice S\&P 500, obtenidos a través de la API de Yahoo Finance para garantizar la calidad y actualidad de la información. El preprocesamiento de datos siguió las mejores prácticas en finanzas cuantitativas, comenzando con el cálculo de retornos logarítmicos continuamente compuestos mediante la transformación:
+\begin{align}
+    Z_t = \ln\left(\frac{P_t}{P_{t-1}}\right) \times 100
+\end{align}
+donde $P_t$ representa el precio de cierre ajustado en el tiempo $t$. Esta especificación asegura que los retornos sean aditivos a través del tiempo y aproximadamente normales para horizontes cortos.
 
-\begin{enumerate}
-    \item \textbf{Cálculo de retornos logarítmicos}: 
-    \begin{align}
-        Z_t = \ln\left(\frac{P_t}{P_{t-1}}\right) \times 100
-    \end{align}
-    donde $P_t$ representa el precio de cierre en el tiempo $t$.
-    
-    \item \textbf{Volatilidad histórica}: Calculada usando una ventana móvil de 7 días:
-    \begin{align}
-        \sigma_{hist,t} = \sqrt{\frac{1}{7-1}\sum_{i=t-6}^{t}(Z_i - \bar{Z}_t)^2}
-    \end{align}
-    
-    \item \textbf{Volatilidad implícita}: Obtenida directamente del índice VIX como medida de referencia.
-\end{enumerate}
+La volatilidad histórica se estimó utilizando una ventana móvil de 7 días para capturar la variabilidad de corto plazo:
+\begin{align}
+    \sigma_{hist,t} = \sqrt{\frac{1}{7-1}\sum_{i=t-6}^{t}(Z_i - \bar{Z}_t)^2}
+\end{align}
+
+Como benchmark de comparación, se utilizó la volatilidad implícita representada por el índice VIX, que proporciona una medida forward-looking de las expectativas de volatilidad del mercado derivada de precios de opciones sobre el S\&P 500.
 
 \subsection{Especificación del modelo}
 
@@ -48,13 +35,7 @@ modelo_garch = arch_model(
 )
 \end{verbatim}
 
-Esta especificación implementa:
-\begin{itemize}
-    \item Media constante: $\mu$
-    \item Volatilidad condicional GARCH(1,1): $h_t = \omega + \alpha_1 Z_{t-1}^2 + \beta_1 h_{t-1}$
-    \item Distribución normal para los residuos estandarizados
-    \item Reescalamiento automático para mejorar la convergencia numérica
-\end{itemize}
+Esta especificación implementa un modelo completamente parametrizado con media constante $\mu$ para capturar el drift esperado de los retornos, y volatilidad condicional GARCH(1,1) definida como $h_t = \omega + \alpha_1 Z_{t-1}^2 + \beta_1 h_{t-1}$. Se asume distribución normal para los residuos estandarizados, proporcionando un marco teórico tractable para la estimación por máxima verosimilitud. El reescalamiento automático mejora la estabilidad numérica del algoritmo de optimización, especialmente importante cuando se trabaja con series financieras que pueden presentar diferentes órdenes de magnitud.
 
 \subsection{Estimación por máxima verosimilitud}
 
@@ -66,12 +47,7 @@ El modelo fue estimado mediante el método de máxima verosimilitud, maximizando
 
 donde $\theta = (\mu, \omega, \alpha_1, \beta_1)$ representa el vector de parámetros a estimar.
 
-La optimización se realizó utilizando algoritmos robustos implementados en la librería \texttt{arch}, con las siguientes características:
-\begin{itemize}
-    \item Estimador de covarianza robusto para los errores estándar
-    \item Condiciones de no negatividad para $\omega$, $\alpha_1$ y $\beta_1$
-    \item Condición de estacionaridad: $\alpha_1 + \beta_1 < 1$
-\end{itemize}
+La optimización se realizó utilizando algoritmos quasi-Newton implementados en la librería \texttt{arch}, que incorporan estimadores de covarianza robustos (Bollerslev-Wooldridge) para los errores estándar, proporcionando inferencia estadística válida incluso bajo desviaciones de normalidad. Las restricciones de no negatividad para los parámetros $\omega$, $\alpha_1$ y $\beta_1$ se imponen automáticamente para garantizar que la volatilidad condicional sea siempre positiva. Adicionalmente, se verifica la condición de estacionaridad $\alpha_1 + \beta_1 < 1$, esencial para asegurar la existencia de momentos finitos y la convergencia del proceso hacia su distribución estacionaria.
 
 \begin{figure}[hbt!]
     \centering
@@ -79,37 +55,23 @@ La optimización se realizó utilizando algoritmos robustos implementados en la 
     \caption{Funciones de autocorrelación (ACF) y autocorrelación parcial (PACF) para los retornos y volatilidad histórica del S\&P 500}
     \label{fig:acf_pacf}   
 \end{figure}
-
-El análisis de las funciones de autocorrelación \ref{fig:acf_pacf} revela patrones característicos que justifican el uso del modelo GARCH:
-\begin{itemize}
-    \item Los retornos muestran autocorrelación prácticamente nula, indicando eficiencia de mercado
-    \item La volatilidad histórica presenta autocorrelación significativa y persistente
-    \item Los patrones sugieren dependencia temporal en la varianza condicional
-\end{itemize}
+\newpage
+El análisis de las funciones de autocorrelación \ref{fig:acf_pacf} revela patrones estilizados característicos de las series financieras que fundamentan teóricamente la especificación GARCH. Los retornos exhiben autocorrelación prácticamente nula, consistente con la hipótesis de eficiencia de mercado en su forma débil, donde los precios incorporan inmediatamente toda la información pasada. En contraste, la volatilidad histórica presenta autocorrelación significativa y altamente persistente, evidenciando dependencia temporal en la varianza condicional. Esta dicotomía entre la independencia serial de los retornos y la dependencia temporal de su volatilidad constituye la motivación fundamental para la modelización GARCH, que permite capturar la heterocedasticidad condicional mientras preserva las propiedades de eficiencia en los precios.
 
 \subsection{Implementación de métricas de evaluación}
 
-Para evaluar la bondad del ajuste, se implementaron múltiples métricas:
+La evaluación de la bondad del ajuste se realizó mediante un conjunto comprehensivo de métricas que abarcan diferentes aspectos del desempeño del modelo. Los criterios de información de Akaike (AIC) y Bayesiano (BIC) se calcularon como:
+\begin{align}
+    AIC &= 2k - 2\ell(\hat{\theta})\\
+    BIC &= k\ln(T) - 2\ell(\hat{\theta})
+\end{align}
+donde $k$ representa el número de parámetros estimados y $T$ el tamaño muestral. Estos criterios permiten la comparación de modelos con diferente número de parámetros, penalizando la complejidad para evitar sobreajuste.
 
-\begin{enumerate}
-    \item \textbf{Criterios de información}:
-    \begin{align}
-        AIC &= 2k - 2\ell(\hat{\theta})\\
-        BIC &= k\ln(T) - 2\ell(\hat{\theta})
-    \end{align}
-    donde $k$ es el número de parámetros y $T$ el tamaño de la muestra.
-    
-    \item \textbf{Métricas de precisión}:
-    \begin{align}
-        MAE &= \frac{1}{T}\sum_{t=1}^{T}|\sigma_{t} - \hat{\sigma}_t|\\
-        RMSE &= \sqrt{\frac{1}{T}\sum_{t=1}^{T}(\sigma_{t} - \hat{\sigma}_t)^2}\\
-        MAPE &= \frac{100}{T}\sum_{t=1}^{T}\left|\frac{\sigma_{t} - \hat{\sigma}_t}{\sigma_{t}}\right|
-    \end{align}
-    
-    \item \textbf{Pruebas de diagnóstico}:
-    \begin{itemize}
-        \item Shapiro-Wilk para normalidad de residuos estandarizados
-        \item Durbin-Watson para autocorrelación de residuos
-        \item Breusch-Pagan para homocedasticidad
-    \end{itemize}
-\end{enumerate}
+Las métricas de precisión predictiva incluyen el Error Absoluto Medio (MAE), la Raíz del Error Cuadrático Medio (RMSE), y el Error Porcentual Absoluto Medio (MAPE):
+\begin{align}
+    MAE &= \frac{1}{T}\sum_{t=1}^{T}|\sigma_{t} - \hat{\sigma}_t|\\
+    RMSE &= \sqrt{\frac{1}{T}\sum_{t=1}^{T}(\sigma_{t} - \hat{\sigma}_t)^2}\\
+    MAPE &= \frac{100}{T}\sum_{t=1}^{T}\left|\frac{\sigma_{t} - \hat{\sigma}_t}{\sigma_{t}}\right|
+\end{align}
+
+El diagnóstico de residuos se complementó con pruebas estadísticas estándar: Shapiro-Wilk para evaluar normalidad de los residuos estandarizados, Durbin-Watson para detectar autocorrelación serial, y Breusch-Pagan para identificar heterocedasticidad residual. Estas pruebas son fundamentales para validar los supuestos distribucionales del modelo y detectar posibles especificaciones incorrectas.
