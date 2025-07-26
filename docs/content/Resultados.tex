@@ -31,7 +31,16 @@ Los resultados exhiben una persistencia de volatilidad extraordinariamente alta,
     \label{fig:volatilidad_comparacion}   
 \end{figure}
 
-La Figura \ref{fig:volatilidad_comparacion} presenta una comparación visual que revela la capacidad superior del modelo GARCH para capturar la dinámica temporal de la volatilidad. El modelo logra capturar efectivamente los clusters de volatilidad característicos de las series financieras, donde períodos de alta turbulencia se agrupan temporalmente seguidos de períodos de relativa calma. Esta correspondencia temporal entre ambas series es particularmente notable durante episodios de estrés de mercado, cuando la volatilidad se eleva significativamente por encima de sus niveles normales. El suavizamiento inherente del modelo GARCH en comparación con la volatilidad histórica más ruidosa refleja su capacidad para filtrar el ruido de corto plazo mientras preserva las señales fundamentales de cambios en el régimen de volatilidad.
+La Figura \ref{fig:volatilidad_comparacion} presenta una comparación visual que revela la capacidad del modelo GARCH para capturar la dinámica temporal de la volatilidad. El modelo logra capturar efectivamente los clusters de volatilidad característicos de las series financieras, donde períodos de alta turbulencia se agrupan temporalmente seguidos de períodos de relativa calma. Esta correspondencia temporal entre ambas series es particularmente notable durante episodios de estrés de mercado, cuando la volatilidad se eleva significativamente por encima de sus niveles normales. El suavizamiento inherente del modelo GARCH en comparación con la volatilidad histórica más ruidosa refleja su capacidad para filtrar el ruido de corto plazo mientras preserva las señales fundamentales de cambios en el régimen de volatilidad.
+
+\begin{figure}[hbt!]
+    \centering
+    \includegraphics[scale=0.4]{../images/volatilidad_vix_comparacion.png}
+    \caption{Comparación entre volatilidad histórica observada y volatilidad implícita (VIX)}
+    \label{fig:volatilidad_vix_comparacion}   
+\end{figure}
+
+La Figura \ref{fig:volatilidad_vix_comparacion} complementa el análisis mediante la comparación directa entre volatilidad histórica y volatilidad implícita representada por el VIX. La visualización revela patrones de comovilidad significativos entre ambas medidas, con el VIX mostrando una tendencia a anticipar movimientos en la volatilidad histórica durante períodos de transición entre regímenes. La correlación observada de 0.5430 entre estas series confirma que ambas capturan aspectos fundamentales pero complementarios de la incertidumbre del mercado, con el VIX proporcionando señales prospectivas y la volatilidad histórica reflejando la materialización de dicha incertidumbre.
 
 \subsection{Métricas de bondad de ajuste}
 
@@ -46,14 +55,14 @@ La evaluación comparativa utilizando criterios de información revela la superi
 \hline
 \textbf{Modelo} & \textbf{AIC} & \textbf{BIC} & \textbf{Log-Likelihood} \\
 \hline
-Volatilidad Implícita (VIX) & 5359.68 & 5364.12 & -2678.84 \\
-Modelo GARCH(1,1) & 941.59 & 959.38 & -466.80 \\
+Volatilidad Implícita (VIX) & 893.91 & 898.36 & -445.96 \\
+Modelo GARCH(1,1) & 886.33 & 904.11 & -439.16 \\
 \hline
 \end{tabular}
 \label{tab:criterios_info}
 \end{table}
 
-Los resultados de la Tabla \ref{tab:criterios_info} demuestran de manera contundente la superioridad del modelo GARCH sobre la volatilidad implícita según ambos criterios de información. La diferencia en AIC de 4418.08 puntos y en BIC de 4404.74 puntos a favor del GARCH constituye evidencia estadística abrumadora de su mejor capacidad explicativa. Esta superioridad se fundamenta en la capacidad del modelo econométrico para capturar patrones sistemáticos en los datos históricos que no son completamente incorporados en las expectativas de volatilidad implícita del mercado. El log-likelihood considerablemente mayor del modelo GARCH sugiere que su especificación paramétrica captura más efectivamente la estructura probabilística subyacente de los datos.
+Los resultados de la Tabla \ref{tab:criterios_info} revelan un desempeño competitivo entre ambos enfoques, con el modelo GARCH mostrando una ligera ventaja en el criterio AIC (diferencia de 7.58 puntos), mientras que la volatilidad implícita presenta un mejor desempeño según el criterio BIC (diferencia de 5.76 puntos). Esta competencia cerrada indica que ambos modelos capturan aspectos complementarios de la dinámica de volatilidad. Esta superioridad se fundamenta en la capacidad del modelo econométrico para capturar patrones sistemáticos en los datos históricos que no son completamente incorporados en las expectativas de volatilidad implícita del mercado. El log-likelihood considerablemente mayor del modelo GARCH sugiere que su especificación paramétrica captura más efectivamente la estructura probabilística subyacente de los datos.
 
 \subsubsection{M�tricas de precisi�n}
 
@@ -64,14 +73,14 @@ Los resultados de la Tabla \ref{tab:criterios_info} demuestran de manera contund
 \hline
 \textbf{Modelo} & \textbf{MAE} & \textbf{RMSE} & \textbf{MAPE(\%)} & \textbf{R�} & \textbf{Correlaci�n} \\
 \hline
-Volatilidad Implícita & 16.3550 & 16.8854 & 2424.08 & -922.95 & 0.6703 \\
-Modelo GARCH(1,1) & 0.3146 & 0.5070 & 49.57 & 0.1669 & 0.4580 \\
+Volatilidad Implícita & 0.3201 & 0.4911 & 38.35 & 0.1320 & 0.5430 \\
+Modelo GARCH(1,1) & 0.2852 & 0.4859 & 38.58 & 0.1505 & 0.4488 \\
 \hline
 \end{tabular}
 \label{tab:metricas_precision}
 \end{table}
 
-Las métricas de precisión revelan una supremacía notable del modelo GARCH en términos de errores de predicción absolutos y relativos. El MAPE del modelo GARCH (49.57%) es sustancialmente menor que el de la volatilidad implícita (2424.08%), indicando una capacidad predictiva considerablemente superior. Esta diferencia dramática sugiere que las expectativas de volatilidad incorporadas en los precios de opciones pueden contener sesgos sistemáticos o primas de riesgo que las alejan de la volatilidad realizada ex-post. Aunque la correlación del GARCH es menor (0.4580 vs 0.6703), esto refleja diferencias en las escalas de medición y no necesariamente implica menor capacidad predictiva. El $R^2$ positivo del GARCH (0.1669) contrasta favorablemente con el valor extremadamente negativo de la volatilidad implícita, confirmando su mejor ajuste a los datos observados.
+Las métricas de precisión revelan un desempeño competitivo entre ambos enfoques, con el modelo GARCH mostrando ventajas en métricas fundamentales de error. El modelo GARCH exhibe un MAE ligeramente inferior (0.2852 vs 0.3201) y un RMSE marginalmente mejor (0.4859 vs 0.4911), indicando errores de predicción levemente menores. Ambos modelos presentan MAPE similares (38.58% vs 38.35%), sugiriendo capacidad predictiva comparable en términos porcentuales. El modelo GARCH demuestra un $R^2$ superior (0.1505 vs 0.1320), indicando mejor capacidad explicativa de la varianza observada. La volatilidad implícita mantiene una correlación ligeramente mayor (0.5430 vs 0.4488), reflejando su naturaleza forward-looking que captura expectativas de mercado no completamente incorporadas en patrones históricos.
 
 \subsection{Pruebas de diagn�stico}
 
@@ -87,8 +96,8 @@ El análisis de residuos proporciona insights fundamentales sobre la adecuación
 \textbf{Modelo} & \textbf{Shapiro-Wilk} & \textbf{Durbin-Watson} & \textbf{Breusch-Pagan} \\
 & \textbf{(normalidad)} & \textbf{(autocorrelaci�n)} & \textbf{(homocedasticidad)} \\
 \hline
-Volatilidad Implícita & $< 0.001$ & 0.0118 & $< 0.001$ \\
-Modelo GARCH(1,1) & $< 0.001$ & 0.4405 & $< 0.001$ \\
+Volatilidad Implícita & $< 0.001$ & 0.3038 & $< 0.001$ \\
+Modelo GARCH(1,1) & $< 0.001$ & 0.2973 & $< 0.001$ \\
 \hline
 \end{tabular}
 \label{tab:pruebas_diagnostico}
@@ -111,3 +120,40 @@ La descomposición paramétrica revela insights importantes sobre la estructura 
 \subsubsection{Comparación con VIX}
 
 La superioridad empírica del modelo GARCH frente al VIX plantea cuestiones fundamentales sobre la eficiencia informativa de los mercados de derivados. Mientras que el VIX incorpora expectativas forward-looking y primas de riesgo, el modelo GARCH extrae patrones predictivos de la información histórica que aparentemente no son completamente capitalizados en los precios de opciones. Esta discrepancia sugiere la existencia de oportunidades para estrategias de inversión que combinen ambos enfoques, aprovechando tanto la información de mercado como los patrones econométricos para mejorar la predicción de volatilidad.
+
+\subsection{Validación con predicciones diarias}
+
+Para evaluar el desempeño predictivo en tiempo real de ambos modelos, se implementó un sistema de validación prospectiva durante el período del 21 al 25 de julio de 2025. Esta metodología permite examinar la capacidad predictiva fuera de muestra en condiciones de mercado actuales, proporcionando una evaluación más robusta de la utilidad práctica de cada enfoque.
+
+\subsubsection{Metodología de validación temporal}
+
+El proceso de validación empleó una ventana móvil de 252 días de negociación (aproximadamente un año calendario) para entrenar el modelo GARCH(1,1), realizando predicciones de volatilidad a un día vista que fueron posteriormente contrastadas con la volatilidad realizada observada. Para el VIX, se utilizaron directamente los valores de cierre como proxy de volatilidad esperada implícita. Esta aproximación refleja condiciones realistas de implementación donde los participantes del mercado deben tomar decisiones basándose en información disponible hasta el momento de la predicción.
+
+\begin{table}[hbt!]
+\centering
+\caption{Resultados de validación temporal: Predicciones vs. Volatilidad Realizada (21-25 julio 2025)}
+\begin{tabular}{lcccccc}
+\hline
+\textbf{Fecha} & \textbf{Día} & \textbf{Vol. Real} & \textbf{GARCH} & \textbf{VIX} & \textbf{Error GARCH} & \textbf{Error VIX} \\
+\hline
+21 jul 2025 & Lunes & 0.3346 & 0.7021 & 0.1665 & 0.3675 & 0.1681 \\
+22 jul 2025 & Martes & 0.2885 & 0.6812 & 0.1650 & 0.3927 & 0.1235 \\
+23 jul 2025 & Miércoles & 0.3836 & 0.6597 & 0.1537 & 0.2762 & 0.2299 \\
+24 jul 2025 & Jueves & 0.2912 & 0.6996 & 0.1539 & 0.4084 & 0.1373 \\
+25 jul 2025 & Viernes & 0.2948 & 0.6749 & 0.1493 & 0.3801 & 0.1455 \\
+\hline
+\textbf{MAE Semanal} & & & \textbf{0.3650} & \textbf{0.1609} & & \\
+\hline
+\end{tabular}
+\label{tab:validacion_temporal}
+\end{table}
+
+\subsubsection{Análisis de resultados temporales}
+
+Los resultados de la Tabla \ref{tab:validacion_temporal} revelan un desempeño superior de la volatilidad implícita durante esta semana específica de validación. El VIX demostró una capacidad predictiva notablemente superior, con un MAE semanal de 0.1609 comparado con 0.3650 del modelo GARCH, representando una mejora del 55.9\% en precisión predictiva. Esta superioridad se manifestó en cuatro de los cinco días de negociación analizados, siendo particularmente notable el martes 22 de julio donde el error del VIX fue de solo 0.1235 comparado con 0.3927 del GARCH.
+
+La ventaja del VIX durante este período puede atribuirse a su naturaleza forward-looking, que incorpora las expectativas del mercado sobre eventos específicos y condiciones macroeconómicas prevalentes durante la semana de análisis. Durante esta semana específica, la volatilidad implícita (VIX) demostró una capacidad predictiva superior al capturar más efectivamente las expectativas de los participantes del mercado sobre la incertidumbre a corto plazo. Este resultado subraya la importancia de considerar el contexto temporal y las condiciones específicas del mercado al evaluar modelos de predicción de volatilidad.
+
+\subsubsection{Implicaciones para la gestión de riesgo}
+
+Los resultados de validación temporal proporcionan insights valiosos para aplicaciones prácticas en gestión de riesgo y trading de volatilidad. La variabilidad en el desempeño relativo entre GARCH y VIX a través del tiempo sugiere que estrategias adaptativas que combinen ambos enfoques podrían ofrecer ventajas sistemáticas. En particular, la capacidad del VIX para anticipar cambios en régimen de volatilidad durante períodos específicos complementa la capacidad del modelo GARCH para capturar patrones de persistencia de largo plazo.

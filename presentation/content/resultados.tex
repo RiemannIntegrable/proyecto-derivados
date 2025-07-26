@@ -67,8 +67,8 @@
             \toprule
             \textbf{Modelo} & \textbf{AIC} & \textbf{BIC} & \textbf{Log-Likelihood} \\
             \midrule
-            Volatilidad Implícita (VIX) & 5359.68 & 5364.12 & -2678.84 \\
-            Modelo GARCH(1,1) & 941.59 & 959.38 & -466.80 \\
+            Volatilidad Implícita (VIX) & 893.91 & 898.36 & -445.96 \\
+            Modelo GARCH(1,1) & 886.33 & 904.11 & -439.16 \\
             \bottomrule
         \end{tabular}
         \caption{Comparación de criterios de información}
@@ -77,12 +77,12 @@
     \vspace{0.5em}
     
     \begin{itemize}
-        \item<2-> \highlight{GARCH supera significativamente al VIX}:
+        \item<2-> \highlight{Competencia cerrada entre modelos}:
         \begin{itemize}
-            \item Diferencia AIC: 4418.08 puntos
-            \item Diferencia BIC: 4404.74 puntos
+            \item GARCH ventaja en AIC: 7.58 puntos
+            \item VIX ventaja en BIC: 5.76 puntos
         \end{itemize}
-        \item<3-> Log-likelihood considerablemente mayor para GARCH
+        \item<3-> Ambos modelos capturan aspectos complementarios
     \end{itemize}
 \end{frame}
 
@@ -113,8 +113,8 @@
             \toprule
             \textbf{Modelo} & \textbf{MAE} & \textbf{RMSE} & \textbf{MAPE(\%)} & \textbf{R²} & \textbf{Correlación} \\
             \midrule
-            Volatilidad Implícita & 16.36 & 16.89 & 2424.08 & -922.95 & 0.6703 \\
-            Modelo GARCH(1,1) & 0.31 & 0.51 & 49.57 & 0.1669 & 0.4580 \\
+            Volatilidad Implícita & 0.3201 & 0.4911 & 38.35 & 0.1320 & 0.5430 \\
+            Modelo GARCH(1,1) & 0.2852 & 0.4859 & 38.58 & 0.1505 & 0.4488 \\
             \bottomrule
         \end{tabular}
         \caption{Métricas de precisión en predicción de volatilidad}
@@ -123,10 +123,10 @@
     \vspace{0.5em}
     
     \begin{itemize}
-        \item<2-> GARCH muestra \highlight{errores significativamente menores}
-        \item<3-> MAPE del GARCH (49.57\%) << VIX (2424.08\%)
-        \item<4-> Aunque correlación menor, se debe a diferencias en escalas
-        \item<5-> R² del GARCH indica ajuste modesto pero positivo
+        \item<2-> \highlight{Desempeño competitivo} entre ambos enfoques
+        \item<3-> GARCH: MAE ligeramente menor (0.2852 vs 0.3201)
+        \item<4-> VIX: Correlación superior (0.5430 vs 0.4488)
+        \item<5-> MAPE similar: GARCH 38.58\% vs VIX 38.35\%
     \end{itemize}
 \end{frame}
 
@@ -138,8 +138,8 @@
             \textbf{Modelo} & \textbf{Shapiro-Wilk} & \textbf{Durbin-Watson} & \textbf{Breusch-Pagan} \\
             & \textbf{(normalidad)} & \textbf{(autocorr.)} & \textbf{(homoced.)} \\
             \midrule
-            Volatilidad Implícita & $< 0.001$ & 0.0118 & $< 0.001$ \\
-            Modelo GARCH(1,1) & $< 0.001$ & 0.4405 & $< 0.001$ \\
+            Volatilidad Implícita & $< 0.001$ & 0.3038 & $< 0.001$ \\
+            Modelo GARCH(1,1) & $< 0.001$ & 0.2973 & $< 0.001$ \\
             \bottomrule
         \end{tabular}
         \caption{Pruebas estadísticas de diagnóstico}
@@ -149,7 +149,50 @@
     
     \begin{itemize}
         \item<2-> \textbf{Normalidad}: Ambos modelos rechazan (colas pesadas)
-        \item<3-> \textbf{Autocorrelación}: GARCH muestra menor evidencia (0.4405 vs 0.0118)
+        \item<3-> \textbf{Autocorrelación}: GARCH menor evidencia (0.2973 vs 0.3038)
         \item<4-> \textbf{Homocedasticidad}: Ambos presentan heterocedasticidad residual
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Comparación VIX vs Volatilidad Histórica}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.7\textwidth]{../images/volatilidad_vix_comparacion.png}
+        \caption{Volatilidad histórica vs volatilidad implícita (VIX)}
+    \end{figure}
+        
+    \begin{itemize}
+        \item<2-> \emphasis{Correlación significativa} de 0.5430 entre series
+        \item<3-> VIX muestra tendencia a \highlight{anticipar movimientos}
+        \item<4-> Complementariedad entre medidas prospectivas y retrospectivas
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Validación Temporal: Predicciones Diarias}
+    \begin{table}
+        \centering
+        \tiny
+        \begin{tabular}{lcccccc}
+            \toprule
+            \textbf{Fecha} & \textbf{Día} & \textbf{Vol. Real} & \textbf{GARCH} & \textbf{VIX} & \textbf{Error GARCH} & \textbf{Error VIX} \\
+            \midrule
+            21 jul & Lun & 0.3346 & 0.7021 & 0.1665 & 0.3675 & 0.1681 \\
+            22 jul & Mar & 0.2885 & 0.6812 & 0.1650 & 0.3927 & 0.1235 \\
+            23 jul & Mié & 0.3836 & 0.6597 & 0.1537 & 0.2762 & 0.2299 \\
+            24 jul & Jue & 0.2912 & 0.6996 & 0.1539 & 0.4084 & 0.1373 \\
+            25 jul & Vie & 0.2948 & 0.6749 & 0.1493 & 0.3801 & 0.1455 \\
+            \midrule
+            \textbf{MAE} & & & \textbf{0.3650} & \textbf{0.1609} & & \\
+            \bottomrule
+        \end{tabular}
+        \caption{Validación prospectiva (21-25 julio 2025)}
+    \end{table}
+    
+    \vspace{0.2em}
+    
+    \begin{itemize}
+        \item<2-> VIX demostró \highlight{superioridad del 55.9\%} en precisión
+        \item<3-> Mejor desempeño en 4 de 5 días analizados
+        \item<4-> Capacidad forward-looking captura expectativas de mercado
     \end{itemize}
 \end{frame}
