@@ -1,20 +1,31 @@
 \section{Marco teórico}
 
-Una serie de tiempo es una serie de ibservaciones indexadas en el tiempo. Mediante modelos de serie clásicos buscan descirbir el comportamiendo del proceso esticastico que subyace a los datos. Bajo condiciones de estacionaridad modelos como el ARMA logra campturar el comportamiento de la serie de timepo. No obstante, en muchos modelos no se puede asumir estacionaridad (como es en el caso del precio de la opciones). Asumir que el proceso estocastico subyacente implica que las propiedades dependientes de los momentos se mantienene en el tiempo; en el caso de estacionaridad debil unicamente se requiere que el valor esperado y la función de covarianza no varien con el tiempo y que exista el sgundo momento.
+Una serie de tiempo es una serie de observaciones indexadas en el tiempo. Mediante modelos de serie clásicos buscan describir el comportamiento del proceso estocástico que subyace a los datos. Bajo condiciones de estacionaridad modelos como el ARMA logra capturar el comportamiento de la serie de tiempo. No obstante, en muchos modelos no se puede asumir estacionaridad (como es en el caso del precio de las opciones). Asumir que el proceso estocástico subyacente implica que las propiedades dependientes de los momentos se mantienen en el tiempo; en el caso de estacionaridad débil únicamente se requiere que el valor esperado y la función de covarianza no varíen con el tiempo y que exista el segundo momento.
 \newline
 
-Si vemos el comprotamiento del S\&P500 vemos que no se cumplen condiones de estacionaridad, en particular la volatidad (la varianza) no se mantiene en el conste durante el tiempo. ¿Será posible establecer un modelo para evaluar y estimar la heterocedasticidad de la serie de timepo? Justamente esta pregunta es lo que busca responder los modelos ARCH (''autoregressive conditional heteroscedasticity'') y GARCH (''general autoregressive condicional heteroscedasticity''). 
-\newline 
+\begin{figure}[hbt!]
+    \centering
+    \includegraphics[scale=0.5]{../images/series_temporales.png}
+    \caption{Análisis de series temporales: Volatilidad histórica del S\&P 500 y volatilidad
+  implícita (VIX)}
+        \label{fig:series_temporales}   
+\end{figure}
 
+Si vemos el comportamiento del S\&P500 \ref{fig:series_temporales} vemos que no se cumplen condiciones de estacionaridad, en particular la volatilidad (la varianza) no se mantiene constante en el tiempo. ¿Será posible establecer un modelo para evaluar y estimar la heterocedasticidad de la serie de tiempo? Justamente esta pregunta es lo que buscan responder los modelos ARCH (''autoregressive conditional heteroscedasticity'') y GARCH (''general autoregressive conditional heteroscedasticity''). 
+\newline 
+\subsection{Modelo ARCH}
 Sea $Z_t:= \ln\left(\frac{P_t}{P_{t-1}}\right)$ y sea $h_t= \mathbb{V}\left(Z_t|Z_s,s<t\right)$, el modelo ARCH plantea que: 
 \begin{align*}
     Z_t = \sqrt{h_t} e_{t},
 \end{align*}
-donde $\{e_t\}$ es un proceso estocastico Normal$(0,1)$ indenticamente distribuido. En este caso $h_t$ es la volatilidad del modelo, y esta va a estar relaciona con el proceso $\{Z_t^2\}$ por medio de la relación: 
+donde $\{e_t\}$ es un proceso estocástico Normal$(0,1)$ independiente e idénticamente distribuido. En este caso $h_t$ es la volatilidad del modelo, y esta va a estar relacionada con el proceso $\{Z_t^2\}$ por medio de la relación: 
 \begin{align*}
     h_t = \alpha_0 + \sum_{i=1}^{p} \alpha_i Z_{t-i}^2,
 \end{align*}
-donde $\alpha_0>0$ y $\alpha_j\geq 0$ para $j\in \{1,\cdots,p\}$. 
+donde $\alpha_0>0$ y $\alpha_j\geq 0$ para $j\in \{1,\cdots,p\}$.
+\subsubsection{Modelo ARCH(1)}
+
+ Para el modelo ARCH(1) se tiene que:
 \begin{align*}
     Z_t^2 &= h_t e_{t}^2\\
     &= e_t^2\left(\alpha_0 + \alpha_1 Z_{t-1}^2\right)\\
@@ -23,40 +34,173 @@ donde $\alpha_0>0$ y $\alpha_j\geq 0$ para $j\in \{1,\cdots,p\}$.
     &= e_t^2\left(\alpha_0 \sum_{j=0}^n \alpha_1^{j}e_{t-1}^2\cdots e_{t-j}^2 +  \alpha_1^{n+1}Z_{t-n-1}^2  e^{2}_{t-1}\cdots e^{2}_{t-n}\right)\\
     &= \alpha_0 \sum_{j=0}^n \alpha_1^{j}e^{2}_t e_{t-1}^2\cdots e_{t-j}^2 +  \alpha_1^{n+1}Z_{t-n-1}^2  e^2_t e^{2}_{t-1}\cdots e^{2}_{t-n}.
 \end{align*}
-
-Por otro lado si se mira la esperanza condicional se tiene:
+De esta última ecuación se tiene que si $\alpha_1<1$ y se asume que $\{Z_t\}$ es un proceso estacionario tal que $Z_t$ es una combinación lineal de $e_s$ para $s\leq t$, entonces:
 \begin{align*}
-    \mathbb{E}(Z_t^2|Z_{t-1})=(\alpha_0+\alpha_1Z^{2}_{t-1} )\mathbb{E}(e^{2}_t|Z_{t-1})=\alpha_0 +\alpha_1 Z_{t-1}^2.
+    \mathbb{E}(\alpha_1^{n+1}Z_{t}^2)=\alpha_1^{n+1}\mathbb{E}(Z_{t}^2)\xrightarrow{\enskip n \enskip} 0 
+\end{align*}  
+Por lo tanto:
+\begin{align*}
+    \lim_{n\rightarrow \infty}\mathbb{E}(Z_t^2)= \alpha_0 \sum_{j=0}^\infty \alpha_1^{j}\mathbb{E}( e^{2}_t e_{t-1}^2\cdots e_{t-j}^2 )=\frac{\alpha_0}{1-\alpha_1}
 \end{align*}
+De este análisis anterior, se tiene la siguiente solución para el modelo ARCH(1):
+Si $\alpha_1<1$ la solución causal del model ARCH(1) está dado por: 
+\begin{align}
+    Z_t=e^t\sqrt{\alpha_1\left(1+\sum_{j=1}^{\infty}\alpha_1^j e_{t-1}^2 \cdots e^{2}_{t-j} \right)},
+\end{align}
+y la solución tiene las siguientes propiedades:
+\begin{align*}
+    \mathbb{E}(Z_t)&=0\\
+    \mathbb{V}(Z_t)&=\frac{\alpha_0}{1-\alpha_1}
+\end{align*}
+\subsubsection{ Modelo ARCH(p)}
 
-De la misma manera, se tiene para el modelo ARCH(p) que la expresión para $Z_t^2$ es:
+Para el modelo ARCH(p) se tiene una solución similar a la del modelo ARCH(1). Se tiene que $Z_t^2$ es:
 
 \begin{align*}
     Z_t^2 &= \left(\sqrt{h_t} e_t\right)^2 = h_t e_t^2\\
     &= \left(\alpha_0 + \sum_{i=1}^{p} \alpha_i Z_{t-i}^2\right) e_t^2\\
     &= \alpha_0 e_t^2 + \sum_{i=1}^{p} \alpha_i Z_{t-i}^2 e_t^2\\
-    &= h_{t-i} e_{t-i}^2 = \left(\alpha_0 + \sum_{j=1}^{p} \alpha_j Z_{t-i-j}^2\right) e_{t-i}^2\\
     &= \alpha_0 e_t^2 + \sum_{i=1}^{p} \alpha_i e_t^2 e_{t-i}^2 \left(\alpha_0 + \sum_{j=1}^{p} \alpha_j Z_{t-i-j}^2\right)\\
     &= \alpha_0 e_t^2 + \alpha_0 \sum_{i=1}^{p} \alpha_i e_t^2 e_{t-i}^2 + \sum_{i=1}^{p} \sum_{j=1}^{p} \alpha_i \alpha_j e_t^2 e_{t-i}^2 Z_{t-i-j}^2\\
     &= \alpha_0 e_t^2 \left(1 + \sum_{k=1}^{\infty} \sum_{\mathbf{i} \in \mathcal{I}_k} \prod_{j=1}^{k} \alpha_{i_j} e_{t-s_j}^2\right) + \text{término residual},
 \end{align*}
 
-donde $\mathcal{I}_k$ denota el conjunto de secuencias de índices de longitud $k$ y $s_j$ son los tiempos correspondientes.
+donde $\mathcal{I}_k$ denota el conjunto de secuencias de índices de longitud $k$ y $s_j$ son los tiempos correspondientes, el término residual es el término que se va a 0 cuando $n$ tiende a infinito. Mediante estos resultados se tiene que la solución para el modelo ARCH(p) cuando $\sum_{1}^p\alpha_j<1 $ y $\alpha_j\geq 0 $ para todo $j\in \{1,\cdots,p\}$ es: 
+\begin{align*}
+    Z_t^2= e^{t}Z_t=e^t\sqrt{\left(1 + \sum_{k=1}^{\infty} \sum_{\mathbf{i} \in \mathcal{I}_k} \prod_{j=1}^{k} \alpha_{i_j} e_{t-s_j}^2\right)}.
+\end{align*}
 \newline
 
 
+
+\subsection{Modelo GARCH}
 
 Para el modelo GARCH(p,q), la volatilidad condicional se extiende a:
 \begin{align*}
     h_t = \alpha_0 + \sum_{i=1}^{p} \alpha_i Z_{t-i}^2 + \sum_{j=1}^{q} \beta_j h_{t-j}
 \end{align*}
 
-La función de verosimilitud para el modelo GARCH, dado los parámetros $\theta = (\alpha_0, \alpha_1, \ldots, \alpha_p, \beta_1, \ldots, \beta_q)$, es:
+donde $\alpha_0 > 0$, $\alpha_i \geq 0$ para $i \in \{1, \ldots, p\}$, $\beta_j \geq 0$ para $j \in \{1, \ldots, q\}$, y para garantizar la estacionaridad en covarianza débil se requiere que $\sum_{i=1}^{\max(p,q)} (\alpha_i + \beta_i) < 1$.
+\newline
+
+El modelo GARCH generaliza el modelo ARCH permitiendo que la volatilidad condicional dependa no solo de los valores pasados de los retornos al cuadrado sino también de sus propios valores de la volatilidad del pasado. 
+\subsubsection{Estimación por máxima verosimilitud}
+
+Para el cálculo de los parámetros del modelo GARCH (al igual que para el modelo ARCH) se hace mediante la optimización de la función de verosimilitud. La función de verosimilitud para el modelo GARCH, dados los parámetros $\theta = (\mu, \alpha_0, \alpha_1, \ldots, \alpha_p, \beta_1, \ldots, \beta_q)$, asumiendo distribución normal condicional, es:
 \begin{align*}
-    L(\theta) = \prod_{t=1}^{T} \frac{1}{\sqrt{2\pi h_t}} \exp\left(-\frac{Z_t^2}{2h_t}\right)
+    L(\theta) = \prod_{t=1}^{T} \frac{1}{\sqrt{2\pi h_t}} \exp\left(-\frac{(Z_t - \mu)^2}{2h_t}\right)
 \end{align*}
 
 La log-verosimilitud correspondiente es:
 \begin{align*}
-    \ell(\theta) = -\frac{T}{2}\ln(2\pi) - \frac{1}{2}\sum_{t=1}^{T}\left[\ln(h_t) + \frac{Z_t^2}{h_t}\right]
-\end{align*} 
+    \ell(\theta) = -\frac{T}{2}\ln(2\pi) - \frac{1}{2}\sum_{t=1}^{T}\left[\ln(h_t) + \frac{(Z_t - \mu)^2}{h_t}\right]
+\end{align*}
+
+La estimación de máxima verosimilitud busca el vector $\hat{\theta}$ que maximiza $\ell(\theta)$:
+\begin{align*}
+    \hat{\theta} = \arg\max_{\theta \in \Theta} \ell(\theta)
+\end{align*}
+
+donde $\Theta$ es el espacio paramétrico que incluye las restricciones de no negatividad y estacionaridad.
+
+\subsubsection{Solución analítica del modelo GARCH(1,1)}
+
+Para el caso específico del modelo GARCH(1,1), la ecuación de volatilidad se simplifica a:
+\begin{align}
+    h_t = \omega + \alpha Z_{t-1}^2 + \beta h_{t-1}
+\end{align}
+
+donde $\omega = \alpha_0$, $\alpha = \alpha_1$ y $\beta = \beta_1$ para simplificar la notación.
+
+Sustituyendo recursivamente hacia atrás y asumiendo que $\alpha + \beta < 1$:
+\begin{align}
+    h_t &= \omega + \alpha Z_{t-1}^2 + \beta h_{t-1}\\
+    &= \omega + \alpha Z_{t-1}^2 + \beta(\omega + \alpha Z_{t-2}^2 + \beta h_{t-2})\\
+    &= \omega(1 + \beta) + \alpha Z_{t-1}^2 + \alpha\beta Z_{t-2}^2 + \beta^2 h_{t-2}\\
+    &= \omega \sum_{j=0}^{n-1} \beta^j + \alpha \sum_{j=0}^{n-1} \beta^j Z_{t-1-j}^2 + \beta^n h_{t-n}
+\end{align}
+
+Tomando el límite cuando $n \to \infty$ y usando la condición de estacionaridad:
+\begin{align}
+    h_t = \frac{\omega}{1-\beta} + \alpha \sum_{j=0}^{\infty} \beta^j Z_{t-1-j}^2
+\end{align}
+
+Esta expresión muestra que la volatilidad condicional es una media ponderada exponencialmente decreciente de todos los choques pasados, más una constante. La velocidad de decaimiento está determinada por $\beta$.
+
+La varianza incondicional estacionaria se obtiene tomando esperanza:
+\begin{align}
+    \mathbb{E}[h_t] = \sigma^2 = \frac{\omega}{1 - \alpha - \beta}
+\end{align}
+
+donde se ha usado el hecho de que $\mathbb{E}[Z_t^2] = \sigma^2$ en el estado estacionario.
+
+\subsubsection{Propiedades del modelo GARCH(1,1)}
+
+El modelo GARCH(1,1) presenta las siguientes propiedades teóricas relevantes:
+
+\begin{enumerate}
+    \item \textbf{Persistencia de volatilidad}: El parámetro $\alpha + \beta$ mide la persistencia. Valores cercanos a 1 indican alta persistencia, donde los choques de volatilidad tienen efectos duraderos.
+    
+    \item \textbf{Clustering de volatilidad}: El modelo captura la tendencia de períodos de alta volatilidad seguidos de alta volatilidad, y períodos de baja volatilidad seguidos de baja volatilidad.
+    
+    \item \textbf{Colas pesadas}: Aunque los residuos estandarizados $\varepsilon_t = Z_t/\sqrt{h_t}$ son normales, la distribución incondicional de $Z_t$ presenta colas más pesadas que la normal.
+    
+    \item \textbf{Vida media de choques}: La vida media de un choque de volatilidad está dada por $\frac{\ln(0.5)}{\ln(\alpha + \beta)}$, que representa el tiempo necesario para que el efecto se reduzca a la mitad.
+\end{enumerate}
+
+\subsection{Volatilidad implícita y el índice VIX}
+
+La volatilidad implícita representa la expectativa del mercado sobre la volatilidad futura de un activo subyacente, derivada de los precios de las opciones. A diferencia de la volatilidad histórica, que se basa en movimientos pasados de precios, la volatilidad implícita es una medida prospectiva que incorpora las expectativas de los participantes del mercado.
+
+\subsubsection{Fundamentos teóricos del VIX}
+
+El VIX (Volatility Index) es un índice que mide la volatilidad implícita esperada del mercado de acciones estadounidense, calculado a partir de los precios de opciones sobre el S\&P 500. Fue desarrollado por el Chicago Board Options Exchange (CBOE) y se ha convertido en el "barómetro del miedo" del mercado.
+
+La metodología del VIX se basa en la fórmula:
+\begin{align}
+    VIX = 100 \times \sqrt{\frac{2}{T} \sum_i \frac{\Delta K_i}{K_i^2} e^{rT} Q(K_i) - \frac{1}{T}\left[\frac{F}{K_0} - 1\right]^2}
+\end{align}
+
+donde:
+\begin{itemize}
+    \item $T$ es el tiempo hasta la expiración
+    \item $F$ es el precio forward del S\&P 500
+    \item $K_i$ son los strikes de las opciones
+    \item $\Delta K_i$ es el intervalo entre strikes
+    \item $r$ es la tasa libre de riesgo
+    \item $Q(K_i)$ es el precio promedio bid-ask de la opción con strike $K_i$
+    \item $K_0$ es el strike más cercano al precio forward $F$
+\end{itemize}
+
+\subsubsection{Interpretación económica del VIX}
+
+El VIX representa la volatilidad anualizada esperada del S\&P 500 en los próximos 30 días, expresada en términos porcentuales. Sus características principales son:
+
+\begin{enumerate}
+    \item \textbf{Medida de aversión al riesgo}: Valores altos del VIX indican mayor incertidumbre y aversión al riesgo en el mercado.
+    
+    \item \textbf{Correlación negativa con el mercado}: Típicamente, el VIX presenta correlación negativa con los retornos del S\&P 500, incrementándose durante caídas del mercado.
+    
+    \item \textbf{Mean reversion}: El VIX tiende a revertir hacia su media histórica de largo plazo, aproximadamente 20\%.
+    
+    \item \textbf{Asimetría temporal}: El VIX puede incrementarse rápidamente durante crisis pero tiende a declinar más lentamente durante recuperaciones.
+\end{enumerate}
+
+\subsubsection{Comparación teórica: volatilidad histórica vs implícita}
+
+La relación entre volatilidad histórica y volatilidad implícita ha sido objeto de extensa investigación en finanzas. Las principales diferencias conceptuales son:
+
+\begin{itemize}
+    \item \textbf{Orientación temporal}: La volatilidad histórica es backward-looking, mientras que la implícita es forward-looking.
+    
+    \item \textbf{Incorporación de información}: La volatilidad implícita incorpora expectativas sobre eventos futuros, primas de riesgo, y la demanda/oferta de opciones.
+    
+    \item \textbf{Eficiencia informativa}: En mercados eficientes, la volatilidad implícita debería ser un mejor predictor de la volatilidad futura realizada.
+    
+    \item \textbf{Sesgo de volatilidad}: La volatilidad implícita frecuentemente excede a la volatilidad realizada ex-post, fenómeno conocido como "volatility risk premium".
+\end{itemize}
+
+\subsection{Análisis empírico de volatilidad}
+
+La Figura \ref{fig:series_temporales} ilustra el comportamiento de la volatilidad en el S\&P 500, mostrando tanto la volatilidad histórica como la volatilidad implícita (VIX). Se observa claramente la presencia de clusters de volatilidad y períodos de alta heterocedasticidad, justificando el uso de modelos ARCH/GARCH para capturar estos patrones.
+
